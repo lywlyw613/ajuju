@@ -10,6 +10,9 @@ SESSION_COOKIE_NAME = "battlecats_session"
 SESSION_MAX_AGE = 60 * 60 * 24 * 30  # 30 天
 SESSION_KEY_OWNED = "owned_cat_ids"
 
+# Render 免費方案建議 true：略過啟動時 pandas/sklearn 特徵表（改用 CSV 分數）
+SKIP_ML_BUILD = os.environ.get("SKIP_ML_BUILD", "").lower() in ("1", "true", "yes")
+
 DATA_JSON = ROOT / "DA_ML_期末專案" / "爬蟲" / "rated_data" / "battlecats_ALL_db.json"
 GACHA_JSON = ROOT / "BattleCats_Output" / "gacha_id_list.json"
 ML_DIR = ROOT / "battle_cats_ml_test3"

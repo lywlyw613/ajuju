@@ -8,7 +8,7 @@ import json
 import sys
 from pathlib import Path
 
-from config import DATA_JSON, GACHA_JSON, ML_DIR, unit_image_url
+from config import DATA_JSON, GACHA_JSON, ML_DIR, SKIP_ML_BUILD, unit_image_url
 from services.analysis import build_ai_analysis
 from services.roster_analysis import get_module_score
 
@@ -149,6 +149,8 @@ def _infer_rarity(cat_id: str) -> str:
 
 
 def _build_scores(raw: dict) -> dict[str, dict]:
+    if SKIP_ML_BUILD:
+        return {}
     try:
         from features import build_feature_dataframe
 
@@ -225,6 +227,21 @@ def search_characters(query: str = "") -> list[dict]:
     return sorted(matched, key=lambda x: x["name"])[:50]
 
 
+def _module_scores_for_detail(cid: str, row: dict) -> dict:
+    csv_row = get_module_score(cid)
+    if csv_row:
+        return {
+            "mod1": round(float(csv_row.get("mod1") or 0), 1),
+            "mod2": round(float(csv_row.get("mod2") or 0), 1),
+            "mod3": round(float(csv_row.get("mod3") or 0), 1),
+        }
+    return {
+        "mod1": round(float(row.get("score_mod1", 0) or 0), 1),
+        "mod2": round(float(row.get("score_mod2", 0) or 0), 1),
+        "mod3": round(float(row.get("score_mod3", 0) or 0), 1),
+    }
+
+
 def get_character_detail(cat_id: str) -> dict | None:
     catalog = get_catalog()
     cid = str(cat_id).zfill(3)
@@ -260,11 +277,7 @@ def get_character_detail(cat_id: str) -> dict | None:
         },
         "ability_tags": _ability_tags(form),
         "abilities_text": abilities_text,
-        "module_scores": {
-            "mod1": round(float(row.get("score_mod1", 0) or 0), 1),
-            "mod2": round(float(row.get("score_mod2", 0) or 0), 1),
-            "mod3": round(float(row.get("score_mod3", 0) or 0), 1),
-        },
+        "module_scores": _module_scores_for_detail(cid, row),
         "ai": ai,
         "trait": row.get("針對屬性", "無"),
     }

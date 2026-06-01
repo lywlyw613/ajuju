@@ -3,9 +3,11 @@ services:
     name: battlecats-analyzer
     runtime: python
     rootDir: battlecats_analyzer
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     plan: free
     envVars:
       - key: SESSION_SECRET
         generateValue: true
+      - key: SKIP_ML_BUILD
+        value: "true"

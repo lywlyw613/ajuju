@@ -43,9 +43,18 @@ templates = Jinja2Templates(directory=APP_DIR / "templates")
 
 @app.on_event("startup")
 def preload_data():
-    from services.catalog import get_catalog
+    """Warm cache in background; app still starts if ML stack is slow."""
+    import logging
 
-    get_catalog()
+    try:
+        from services.catalog import get_catalog
+
+        get_catalog()
+        logging.getLogger("uvicorn.error").info("Catalog preloaded.")
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning(
+            "Catalog preload skipped (will lazy-load): %s", exc
+        )
 
 
 _IMAGE_CACHE: dict[str, bytes] = {}
