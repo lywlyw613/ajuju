@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block breadcrumb %}
+<div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; 搜尋角色</div>
+{% endblock %}
+{% block content %}
+<form class="search-form" method="get" action="/search">
+  <input type="search" name="q" value="{{ query }}" placeholder="搜尋角色名稱" />
+  <button type="submit" class="btn btn-primary" style="padding:0.7rem 1rem;border-radius:10px;">搜尋</button>
+</form>
+
+<div class="char-list">
+  {% for c in characters %}
+  <div class="char-card" style="cursor:default;">
+    <div class="thumb"><img src="{{ c.image_url }}" alt="{{ c.name }}" loading="lazy" /></div>
+    <div class="info">
+      <div class="name">{{ c.name }}</div>
+      {% if c.name_base and c.name_base != c.name %}
+      <div class="name-sub" style="font-size:0.72rem;color:var(--muted)">一階：{{ c.name_base }}</div>
+      {% endif %}
+      <div class="meta">
+        <span class="rarity rarity-{{ c.rarity }}">{{ c.rarity }}</span>
+        · ID {{ c.id }}
+      </div>
+    </div>
+    <a class="btn-sm" href="/character/{{ c.id }}">查看數值</a>
+  </div>
+  {% else %}
+  <p class="empty">找不到符合的角色</p>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>近期卡池</h2>
+  <p class="hero-sub">{{ pool_name }} · 精選 SSR / SSSR</p>
+  <div class="carousel">
+    {% for s in slides %}
+    <a class="carousel-item" href="/character/{{ s.id }}">
+      <div class="img-wrap">
+        <img src="{{ s.image_url }}" alt="{{ s.name }}" loading="lazy" />
+      </div>
+      <div class="cap">{{ s.name }}<br><span style="font-weight:400;color:var(--muted)">{{ s.rarity }} · {{ s.score }}/10</span></div>
+    </a>
+    {% else %}
+    <p class="empty">尚無卡池資料</p>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="btn-row">
+  <a class="btn btn-primary" href="/gacha">卡池分析</a>
+  <a class="btn btn-ghost" href="/search">搜尋角色</a>
+</div>
+
+<section class="card">
+  <h2>系統說明</h2>
+  <p class="hero-sub">貓咪大戰爭角色分析 — 整合數值、能力與 AI 評語，協助抽卡與培養決策。</p>
+</section>
+{% endblock %}

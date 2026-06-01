@@ -1,0 +1,15 @@
+{
+  "$comment": "此專案含大型 JSON 與 sklearn，不適合 Vercel Serverless。請改用 Render（見 render.yaml）或 Railway。",
+  "builds": [
+    {
+      "src": "battlecats_analyzer/main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "battlecats_analyzer/main.py"
+    }
+  ]
+}
