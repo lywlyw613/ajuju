@@ -8,8 +8,17 @@ from fastapi import FastAPI, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
 
-from config import APP_TITLE, POOL_NAME, unit_image_url
+from config import (
+    APP_TITLE,
+    POOL_NAME,
+    SESSION_COOKIE_NAME,
+    SESSION_KEY_OWNED,
+    SESSION_MAX_AGE,
+    SESSION_SECRET,
+    unit_image_url,
+)
 from services.catalog import (
     get_carousel_slides,
     get_character_detail,
@@ -20,6 +29,14 @@ from services.roster_analysis import analyze_roster
 
 APP_DIR = Path(__file__).resolve().parent
 app = FastAPI(title=APP_TITLE)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=SESSION_SECRET,
+    session_cookie=SESSION_COOKIE_NAME,
+    max_age=SESSION_MAX_AGE,
+    same_site="lax",
+    https_only=False,
+)
 app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=APP_DIR / "templates")
 
@@ -68,7 +85,30 @@ async def home(request: Request):
     )
 
 
-def _gacha_context(query: str, selected_ids: list[str], analysis=None):
+def _normalize_cat_ids(ids: list[str]) -> list[str]:
+    return sorted({str(i).strip().zfill(3) for i in ids if str(i).strip()})
+
+
+def _load_owned_session(request: Request) -> list[str]:
+    raw = request.session.get(SESSION_KEY_OWNED, [])
+    if isinstance(raw, list):
+        return _normalize_cat_ids([str(x) for x in raw])
+    return []
+
+
+def _save_owned_session(request: Request, ids: list[str]) -> list[str]:
+    normalized = _normalize_cat_ids(ids)
+    request.session[SESSION_KEY_OWNED] = normalized
+    return normalized
+
+
+def _gacha_context(
+    query: str,
+    selected_ids: list[str],
+    *,
+    analysis=None,
+    saved_message: str | None = None,
+):
     selected = {str(i).zfill(3) for i in selected_ids}
     return {
         "title": APP_TITLE,
@@ -76,7 +116,9 @@ def _gacha_context(query: str, selected_ids: list[str], analysis=None):
         "query": query,
         "characters": get_gacha_pool(query),
         "selected_ids": selected,
+        "owned_count": len(selected),
         "analysis": analysis,
+        "saved_message": saved_message,
     }
 
 
@@ -85,9 +127,17 @@ async def gacha_page(
     request: Request,
     q: str = Query("", alias="q"),
     select_all: bool = Query(False),
+    clear_owned: bool = Query(False),
 ):
-    chars = get_gacha_pool(q)
-    selected = [c["id"] for c in chars] if select_all else []
+    if clear_owned:
+        request.session.pop(SESSION_KEY_OWNED, None)
+        selected: list[str] = []
+    elif select_all:
+        chars = get_gacha_pool(q)
+        selected = _save_owned_session(request, [c["id"] for c in chars])
+    else:
+        selected = _load_owned_session(request)
+
     return templates.TemplateResponse(
         request,
         "gacha.html",
@@ -96,16 +146,26 @@ async def gacha_page(
 
 
 @app.post("/gacha", response_class=HTMLResponse)
-async def gacha_analyze(
+async def gacha_post(
     request: Request,
     q: str = Form(""),
     selected_ids: list[str] = Form([]),
+    action: str = Form("analyze"),
 ):
-    analysis = analyze_roster(selected_ids)
+    saved = _save_owned_session(request, selected_ids)
+    analysis = None
+    saved_message = None
+
+    if action == "save":
+        saved_message = f"已儲存 {len(saved)} 隻持有角色（離開頁面後仍會保留勾選）"
+    else:
+        analysis = analyze_roster(saved)
+        saved_message = f"已儲存 {len(saved)} 隻持有角色並完成組合分析"
+
     return templates.TemplateResponse(
         request,
         "gacha.html",
-        _gacha_context(q, selected_ids, analysis=analysis),
+        _gacha_context(q, saved, analysis=analysis, saved_message=saved_message),
     )
 
 

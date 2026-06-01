@@ -4,7 +4,11 @@
 {% endblock %}
 {% block content %}
 <h2 class="hero-title">{{ pool_name }}</h2>
-<p class="hero-sub">SSR / SSSR · 顯示 {{ characters|length }} 隻 · 勾選已持有角色後分析組合強度</p>
+<p class="hero-sub">SSR / SSSR · 顯示 {{ characters|length }} 隻 · 已儲存持有 {{ owned_count }} 隻</p>
+{% if saved_message %}
+<p class="session-flash">{{ saved_message }}</p>
+{% endif %}
+<p class="hero-sub" style="margin-top:0.35rem;font-size:0.75rem">勾選後請按「儲存持有」或「分析組合」（皆會寫入 Session，換頁不會消失）</p>
 
 <form class="search-form" method="get" action="/gacha">
   <input type="search" name="q" value="{{ query }}" placeholder="以名字或 ID 搜尋（例：武蔵、449）" />
@@ -67,8 +71,9 @@
 
   <div class="gacha-toolbar">
     <a class="btn btn-ghost" href="/gacha?q={{ query }}&select_all=1">全選目前列表</a>
-    <a class="btn btn-ghost" href="/gacha?q={{ query }}">清除勾選</a>
-    <button type="submit" class="btn btn-primary">分析已持有組合</button>
+    <a class="btn btn-ghost" href="/gacha?q={{ query }}&clear_owned=1">清除勾選</a>
+    <button type="submit" name="action" value="save" class="btn btn-ghost">儲存持有</button>
+    <button type="submit" name="action" value="analyze" class="btn btn-primary">分析組合</button>
   </div>
 
   <div class="gacha-grid">
@@ -109,7 +114,8 @@
   </div>
 
   <div class="gacha-bottom-bar">
-    <button type="submit" class="btn btn-primary">分析已持有組合</button>
+    <button type="submit" name="action" value="save" class="btn btn-ghost" style="margin-bottom:0.5rem">儲存持有</button>
+    <button type="submit" name="action" value="analyze" class="btn btn-primary">分析組合</button>
   </div>
 </form>
 {% endblock %}

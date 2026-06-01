@@ -23,6 +23,17 @@ python -m uvicorn main:app --host 127.0.0.1 --port 8000
 
 卡池組合分析使用 `battlecats_analyzer/data/module_scores_export.csv`。
 
+## Session（卡池持有勾選）
+
+勾選狀態由 Python **伺服器 Session** 保存（`SessionMiddleware`），從首頁再回到卡池仍會還原。
+
+1. 勾選角色後按 **儲存持有** 或 **分析組合**（兩者都會寫入 session）
+2. Render 部署請設定環境變數 `SESSION_SECRET`（`render.yaml` 可自動產生）
+
+## GitHub → Render 自動更新
+
+Render 若已連接 GitHub 並開啟 **Auto-Deploy**，推送到 `main` 分支後會自動重新 build 與部署。
+
 ## 部署說明
 
 ### Vercel（不建議此專案使用）
