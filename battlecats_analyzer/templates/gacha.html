@@ -216,18 +216,18 @@
 
   </div>
 
-
-
-  <div class="gacha-fab-stack" role="group" aria-label="持有操作">
-    <button type="submit" name="action" value="save" class="gacha-fab gacha-fab-save" title="儲存持有" aria-label="儲存持有">
-      <span class="gacha-fab-glyph" aria-hidden="true">存</span>
-    </button>
-    <button type="submit" name="action" value="analyze" class="gacha-fab gacha-fab-analyze" title="更新陣容評分" aria-label="更新陣容評分">
-      <span class="gacha-fab-glyph" aria-hidden="true">評</span>
-    </button>
-  </div>
-
 </form>
 
+{% endblock %}
+
+{% block phone_overlays %}
+<div class="gacha-fab-stack" role="group" aria-label="持有操作">
+  <button type="submit" form="roster-form" name="action" value="save" class="gacha-fab gacha-fab-save" title="儲存持有" aria-label="儲存持有">
+    <span class="gacha-fab-glyph" aria-hidden="true">存</span>
+  </button>
+  <button type="submit" form="roster-form" name="action" value="analyze" class="gacha-fab gacha-fab-analyze" title="更新陣容評分" aria-label="更新陣容評分">
+    <span class="gacha-fab-glyph" aria-hidden="true">評</span>
+  </button>
+</div>
 {% endblock %}
 
