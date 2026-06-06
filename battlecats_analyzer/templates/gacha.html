@@ -39,33 +39,68 @@
 
 
 <div class="gacha-insights">
-  {% if owned_count > 0 and lineup and lineup.count > 0 %}
-  <a class="insight-card insight-card-primary" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
-    <div class="insight-head">陣容評分 <span class="priority-badge">優先參考</span></div>
-    <div class="insight-value">{{ lineup.lineup_score_label }} · {{ lineup.tier }}</div>
-    <div class="insight-cta">查看詳情 →</div>
-  </a>
-  {% elif owned_count > 0 %}
-  <a class="insight-card insight-card-muted" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
-    <div class="insight-head">陣容評分</div>
-    <div class="insight-value">尚無模組分資料</div>
-    <div class="insight-cta">查看詳情 →</div>
-  </a>
-  {% else %}
-  <a class="insight-card insight-card-muted" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
-    <div class="insight-head">陣容評分</div>
-    <div class="insight-value">勾選持有角色後查看</div>
-    <div class="insight-cta">前往 →</div>
-  </a>
-  {% endif %}
+  <p class="gacha-insights-label">快速分析</p>
+  <div class="gacha-insights-grid">
+    {% if owned_count > 0 and lineup and lineup.count > 0 %}
+    {% set lineup_score = lineup.lineup_score_label.split(' / ') %}
+    <a class="insight-tile insight-tile-roster" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
+      <div class="insight-tile-main">
+        <div class="insight-tile-head">
+          <span class="insight-tile-icon" aria-hidden="true">★</span>
+          <span class="insight-tile-title">陣容評分</span>
+          <span class="priority-badge">優先</span>
+        </div>
+        <div class="insight-tile-metrics">
+          <span class="insight-tile-num">{{ lineup_score[0] }}</span>
+          {% if lineup_score|length > 1 %}<span class="insight-tile-denom">/ {{ lineup_score[1] }}</span>{% endif %}
+        </div>
+        <div class="insight-tile-tag">{{ lineup.tier }}</div>
+      </div>
+      <span class="insight-tile-arrow" aria-hidden="true">›</span>
+    </a>
+    {% elif owned_count > 0 %}
+    <a class="insight-tile insight-tile-roster insight-tile-empty" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
+      <div class="insight-tile-main">
+        <div class="insight-tile-head">
+          <span class="insight-tile-icon" aria-hidden="true">★</span>
+          <span class="insight-tile-title">陣容評分</span>
+        </div>
+        <div class="insight-tile-placeholder">尚無模組分資料</div>
+      </div>
+      <span class="insight-tile-arrow" aria-hidden="true">›</span>
+    </a>
+    {% else %}
+    <a class="insight-tile insight-tile-roster insight-tile-empty" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
+      <div class="insight-tile-main">
+        <div class="insight-tile-head">
+          <span class="insight-tile-icon" aria-hidden="true">★</span>
+          <span class="insight-tile-title">陣容評分</span>
+        </div>
+        <div class="insight-tile-placeholder">勾選持有後查看</div>
+      </div>
+      <span class="insight-tile-arrow" aria-hidden="true">›</span>
+    </a>
+    {% endif %}
 
-  {% if pool_report %}
-  <a class="insight-card" href="/gacha/pool?pool={{ pool_key|urlencode }}">
-    <div class="insight-head">卡池分析 <span class="section-sub-badge">整池參考</span></div>
-    <div class="insight-value">{{ pool_report.pool_score_label }} · {{ pool_report.recommendation }}</div>
-    <div class="insight-cta">查看詳情 →</div>
-  </a>
-  {% endif %}
+    {% if pool_report %}
+    {% set pool_score = pool_report.pool_score_label.split(' / ') %}
+    <a class="insight-tile insight-tile-pool" href="/gacha/pool?pool={{ pool_key|urlencode }}">
+      <div class="insight-tile-main">
+        <div class="insight-tile-head">
+          <span class="insight-tile-icon" aria-hidden="true">◆</span>
+          <span class="insight-tile-title">卡池分析</span>
+          <span class="section-sub-badge">整池</span>
+        </div>
+        <div class="insight-tile-metrics">
+          <span class="insight-tile-num">{{ pool_score[0] }}</span>
+          {% if pool_score|length > 1 %}<span class="insight-tile-denom">/ {{ pool_score[1] }}</span>{% endif %}
+        </div>
+        <div class="insight-tile-tag">{{ pool_report.recommendation }}</div>
+      </div>
+      <span class="insight-tile-arrow" aria-hidden="true">›</span>
+    </a>
+    {% endif %}
+  </div>
 </div>
 
 

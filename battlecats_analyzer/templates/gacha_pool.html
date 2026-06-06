@@ -11,11 +11,24 @@
 <a class="back-link" href="/gacha?pool={{ pool_key|urlencode }}">← 返回卡池角色列表</a>
 
 {% if owned_count > 0 and lineup and lineup.count > 0 %}
-<a class="insight-card insight-card-primary insight-card-inline" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
-  <div class="insight-head">你的陣容評分 <span class="priority-badge">優先參考</span></div>
-  <div class="insight-value">{{ lineup.lineup_score_label }} · {{ lineup.tier }}</div>
-  <div class="insight-cta">查看陣容評分 →</div>
-</a>
+{% set lineup_score = lineup.lineup_score_label.split(' / ') %}
+<div class="gacha-insights gacha-insights-single">
+  <a class="insight-tile insight-tile-roster" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
+    <div class="insight-tile-main">
+      <div class="insight-tile-head">
+        <span class="insight-tile-icon" aria-hidden="true">★</span>
+        <span class="insight-tile-title">你的陣容評分</span>
+        <span class="priority-badge">優先</span>
+      </div>
+      <div class="insight-tile-metrics">
+        <span class="insight-tile-num">{{ lineup_score[0] }}</span>
+        {% if lineup_score|length > 1 %}<span class="insight-tile-denom">/ {{ lineup_score[1] }}</span>{% endif %}
+      </div>
+      <div class="insight-tile-tag">{{ lineup.tier }}</div>
+    </div>
+    <span class="insight-tile-arrow" aria-hidden="true">›</span>
+  </a>
+</div>
 {% endif %}
 
 {% include "partials/pool_report_section.html" %}

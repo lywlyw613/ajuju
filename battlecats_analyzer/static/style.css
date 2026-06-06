@@ -1049,71 +1049,180 @@ main {
 }
 
 .gacha-insights {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
   margin-bottom: 0.85rem;
 }
 
-.insight-card {
+.gacha-insights-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.45rem;
+  padding-left: 0.1rem;
+}
+
+.gacha-insights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+
+.gacha-insights-single .gacha-insights-grid,
+.gacha-insights-single {
   display: block;
-  text-decoration: none;
+}
+
+.gacha-insights-single .insight-tile {
+  max-width: 100%;
+}
+
+.insight-tile {
+  display: flex;
+  align-items: stretch;
+  gap: 0.15rem;
+  min-width: 0;
+  text-decoration: none !important;
   color: inherit;
-  background: var(--card);
+  background: linear-gradient(160deg, #fff 0%, var(--card) 100%);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.7rem 0.85rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 14px;
+  padding: 0.65rem 0.55rem 0.65rem 0.7rem;
+  box-shadow: 0 2px 8px rgba(59, 50, 33, 0.08);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.insight-card:hover {
+.insight-tile:hover {
   border-color: rgba(180, 76, 57, 0.35);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 14px rgba(59, 50, 33, 0.12);
 }
 
-.insight-card-primary {
-  border: 2px solid var(--accent);
-  box-shadow: 0 2px 12px rgba(180, 76, 57, 0.12);
+.insight-tile:active {
+  transform: scale(0.98);
 }
 
-.insight-card-muted {
-  opacity: 0.92;
+.insight-tile-roster {
+  border-top: 3px solid var(--accent);
+}
+
+.insight-tile-pool {
+  border-top: 3px solid #6b5b95;
+}
+
+.insight-tile-empty {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.85) 0%, var(--card-alt) 100%);
   border-style: dashed;
+  border-top-style: solid;
+  opacity: 0.95;
+}
+
+.insight-tile-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.insight-tile-head {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.insight-tile-icon {
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  line-height: 1;
+  border-radius: 999px;
+  background: rgba(180, 76, 57, 0.12);
+  color: var(--accent);
+}
+
+.insight-tile-pool .insight-tile-icon {
+  background: rgba(107, 91, 149, 0.14);
+  color: #6b5b95;
+}
+
+.insight-tile-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.insight-tile-head .priority-badge,
+.insight-tile-head .section-sub-badge {
+  margin-left: auto;
+  font-size: 0.58rem;
+  padding: 0.12rem 0.38rem;
+}
+
+.insight-tile-metrics {
+  display: flex;
+  align-items: baseline;
+  gap: 0.12rem;
+  line-height: 1;
+  margin-bottom: 0.28rem;
+}
+
+.insight-tile-num {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.insight-tile-pool .insight-tile-num {
+  color: #5a4a82;
+}
+
+.insight-tile-denom {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.insight-tile-tag {
+  display: inline-block;
+  max-width: 100%;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  padding: 0.15rem 0.45rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.insight-tile-placeholder {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.35;
+  padding: 0.15rem 0;
+}
+
+.insight-tile-arrow {
+  flex-shrink: 0;
+  align-self: center;
+  font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1;
+  color: rgba(92, 92, 110, 0.45);
+  padding-right: 0.05rem;
 }
 
 .insight-card-inline {
   margin-bottom: 0.75rem;
-}
-
-.insight-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.4rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 0.25rem;
-}
-
-.insight-value {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: var(--accent);
-  line-height: 1.35;
-}
-
-.insight-card-muted .insight-value {
-  color: var(--muted);
-  font-weight: 600;
-  font-size: 0.82rem;
-}
-
-.insight-cta {
-  margin-top: 0.35rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--muted);
 }
 
 .back-link {
