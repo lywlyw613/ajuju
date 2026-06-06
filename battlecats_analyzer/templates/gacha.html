@@ -82,8 +82,7 @@
     </a>
     {% endif %}
 
-    {% if pool_report %}
-    {% set pool_score = pool_report.pool_score_label.split(' / ') %}
+    {% if pool_report and pool_report.status == "success" %}
     <a class="insight-tile insight-tile-pool" href="/gacha/pool?pool={{ pool_key|urlencode }}">
       <div class="insight-tile-main">
         <div class="insight-tile-head">
@@ -91,16 +90,20 @@
           <span class="insight-tile-title">卡池分析</span>
           <span class="section-sub-badge">整池</span>
         </div>
-        <div class="insight-tile-metrics">
-          <span class="insight-tile-num">{{ pool_score[0] }}</span>
-          {% if pool_score|length > 1 %}<span class="insight-tile-denom">/ {{ pool_score[1] }}</span>{% endif %}
-        </div>
-        <div class="insight-tile-tag">{{ pool_report.recommendation }}</div>
+        <div class="insight-tile-tag insight-tile-tag-lg">{{ pool_report.recommendation_short }}</div>
+        {% if owned_count > 0 %}
+        <div class="insight-tile-placeholder">重複率 {{ pool_report.stats.dup_rate }} · EV {{ pool_report.ev_current }}</div>
+        {% else %}
+        <div class="insight-tile-placeholder">未勾選持有 · 以零持有估算</div>
+        {% endif %}
       </div>
       <span class="insight-tile-arrow" aria-hidden="true">›</span>
     </a>
     {% endif %}
   </div>
+  <p class="hero-sub" style="font-size:0.72rem;margin-top:0.35rem">
+    <a href="/gacha/rankings?pool={{ pool_key|urlencode }}">查看全卡池 EV 排行（notebook 同款表格）</a>
+  </p>
 </div>
 
 

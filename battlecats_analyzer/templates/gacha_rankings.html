@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "partials/pool_engine_data.html" import rankings_table %}
+
+{% block breadcrumb %}
+<div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; <a href="/gacha">卡池</a> &gt;&gt; EV 排行</div>
+{% endblock %}
+
+{% block content %}
+<h2 class="hero-title">卡池期望值排行</h2>
+<p class="hero-sub">依 Session 持有 {{ owned_count }} 隻 · 共 {{ rankings.total_pools }} 池 · 對應 notebook <code>gacha_recommendation_system_pr</code></p>
+
+<a class="back-link" href="/gacha{% if pool_key %}?pool={{ pool_key|urlencode }}{% endif %}">← 返回卡池</a>
+
+<section class="card engine-output-card">
+  <div class="engine-threshold-banner">
+    <span>PR40 推薦門檻 (EV)：<strong>{{ rankings.thresholds.pr40 }}</strong></span>
+    <span>PR80 極度推薦門檻 (EV)：<strong>{{ rankings.thresholds.pr80 }}</strong></span>
+  </div>
+
+  <p class="engine-note">排序依「最新期望值 ev_current」降序，欄位與 notebook 輸出 <code>df_gacha_rank.head(15)</code> 相同。</p>
+
+  {{ rankings_table(rankings.rows, pool_key) }}
+</section>
+
+<p class="hero-sub" style="margin-top:0.75rem;font-size:0.75rem">
+  持有清單來自卡池頁勾選。調整後請回<a href="/gacha">卡池頁</a>更新 Session。
+</p>
+{% endblock %}

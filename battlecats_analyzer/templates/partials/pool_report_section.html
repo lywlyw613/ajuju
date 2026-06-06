@@ -1,54 +1,144 @@
 {% from "partials/gacha_macros.html" import explanation_row %}
-{% if pool_report %}
+{% if pool_report and pool_report.status == "success" %}
+
 <section class="card pool-report pool-report-secondary">
+
   <div class="section-head-row">
     <h2>卡池分析</h2>
-    <span class="section-sub-badge">整池參考</span>
+    <span class="section-sub-badge">依持有狀況</span>
   </div>
 
-  <p class="hero-sub" style="margin-bottom:0.75rem">以下為整個卡池的概略評價；若已勾選持有角色，請<strong>優先看陣容評分</strong>。</p>
+  <p class="hero-sub" style="margin-bottom:0.75rem">
+    以下依你 Session 中勾選的 <strong>{{ owned_count }}</strong> 隻持有角色計算。
+    個人陣容強度請看<a href="/gacha/lineup?pool={{ pool_key|urlencode }}">陣容評分</a>。
+  </p>
 
-  <div class="pool-report-grid">
-    <div class="pool-report-block">
-      <div class="pool-report-label">Pool Score</div>
-      <div class="pool-report-value">{{ pool_report.pool_score_label }}</div>
-      {% if pool_report.is_mock_score %}
-      <div class="mock-tag">模擬分數 · 待後端模型串接</div>
-      {% endif %}
+  <div class="pool-rec-hero">
+    <div class="pool-rec-label">總體評價（recommendation_level）</div>
+    <div class="pool-rec-value">{{ pool_report.recommendation_level }}</div>
+  </div>
+
+  <p class="hero-sub" style="font-size:0.75rem;margin-bottom:0.5rem">
+    <a href="/gacha/rankings?pool={{ pool_key|urlencode }}">全卡池 EV 排行</a>
+    · 下方可展開「引擎原始數據」對照 notebook 輸出
+  </p>
+
+  {% set exp = pool_report.display_explanations %}
+  {% if exp.core_reason or exp.sub_reason or exp.risk_hint %}
+  <div class="pool-explain-block">
+    {% if exp.core_reason %}<p class="pool-explain-line pool-explain-core">{{ exp.core_reason }}</p>{% endif %}
+    {% if exp.sub_reason %}<p class="pool-explain-line">{{ exp.sub_reason }}</p>{% endif %}
+    {% if exp.risk_hint %}<p class="pool-explain-line pool-explain-risk">{{ exp.risk_hint }}</p>{% endif %}
+  </div>
+  {% endif %}
+
+  {% set st = pool_report.stats %}
+  <div class="stats-grid pool-stats-grid">
+    <div class="stat-item">
+      <div class="label">池內 SSR</div>
+      <div class="val">{{ st.total_ssr }} 隻</div>
     </div>
-
-    <div class="pool-report-block">
-      <div class="pool-report-label">Recommendation</div>
-      <div class="pool-report-value rec">{{ pool_report.recommendation }}</div>
+    <div class="stat-item">
+      <div class="label">已擁有 SSR</div>
+      <div class="val">{{ st.owned_ssr }} 隻</div>
+    </div>
+    <div class="stat-item">
+      <div class="label">池內 SSSR</div>
+      <div class="val">{{ st.total_sssr }} 隻</div>
+    </div>
+    <div class="stat-item">
+      <div class="label">重複率</div>
+      <div class="val">{{ st.dup_rate }}</div>
     </div>
   </div>
 
-  <div class="pool-report-block explanation-block">
-    <div class="pool-report-label">Explanation</div>
+  {% set pk = pool_report.pockets %}
+  <div class="pocket-section">
+    <h3 class="pocket-heading">目標分級（未擁有）</h3>
 
-    {% if pool_report.explanation_summary %}
-    <div class="explanation-summary">
-      <span class="explanation-head">{{ pool_report.explanation_summary.head }}</span>
-      <span class="explanation-points">{{ pool_report.explanation_summary.points|join(' · ') }}</span>
+    {% if pk.god_unowned %}
+    <div class="pocket-block pocket-god">
+      <div class="pocket-label">神級 ≥ 4.3</div>
+      <ul class="pocket-list">
+        {% for c in pk.god_unowned %}
+        <li><a href="/character/{{ c.id }}"><strong class="char-name-bold">{{ c.name }}</strong></a> · {{ c.rarity }} · {{ c.score }}</li>
+        {% endfor %}
+      </ul>
     </div>
     {% endif %}
 
+    {% if pk.s_unowned %}
+    <div class="pocket-block pocket-s">
+      <div class="pocket-label">S 級 3.75 – 4.3</div>
+      <ul class="pocket-list">
+        {% for c in pk.s_unowned %}
+        <li><a href="/character/{{ c.id }}"><strong class="char-name-bold">{{ c.name }}</strong></a> · {{ c.rarity }} · {{ c.score }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if pk.a_unowned %}
+    <div class="pocket-block pocket-a">
+      <div class="pocket-label">A 級 3.25 – 3.75</div>
+      <ul class="pocket-list pocket-list-compact">
+        {% for c in pk.a_unowned %}
+        <li><a href="/character/{{ c.id }}">{{ c.name }}</a> · {{ c.score }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if not pk.god_unowned and not pk.s_unowned and not pk.a_unowned %}
+    <p class="empty pocket-empty">此池在您的持有狀況下，已無未擁有的 S 級以上目標。</p>
+    {% endif %}
+  </div>
+
+  {% if pool_report.review_visible %}
+  <div class="pool-report-block explanation-block" style="margin-top:1rem">
+    <div class="pool-report-label">角色短評（補充）</div>
+    {% if pool_report.review_summary %}
+    <div class="explanation-summary">
+      <span class="explanation-head">{{ pool_report.review_summary.head }}</span>
+      <span class="explanation-points">{{ pool_report.review_summary.points|join(' · ') }}</span>
+    </div>
+    {% endif %}
     <ul class="explanation-list">
-      {% for item in pool_report.explanation_visible %}
+      {% for item in pool_report.review_visible %}
       {{ explanation_row(item) }}
       {% endfor %}
     </ul>
-
-    {% if pool_report.explanation_has_more %}
+    {% if pool_report.review_has_more %}
     <details class="explanation-expand">
-      <summary>展開列表（另有 {{ pool_report.explanation_hidden_count }} 項）</summary>
+      <summary>展開列表（另有 {{ pool_report.review_hidden_count }} 項）</summary>
       <ul class="explanation-list">
-        {% for item in pool_report.explanation_hidden %}
+        {% for item in pool_report.review_hidden %}
         {{ explanation_row(item) }}
         {% endfor %}
       </ul>
     </details>
     {% endif %}
   </div>
+  {% endif %}
+
+  <details class="guide-hint data-source-hint">
+    <summary>這些數字從哪來？</summary>
+    <div class="guide-body">
+      <ul>
+        {% for line in pool_report.data_sources %}
+        <li>{{ line }}</li>
+        {% endfor %}
+        <li>引擎程式：<code>services/gacha_explanation_engine.py</code>（對應組員 notebook <code>DA_ML_PoolScore</code>）</li>
+        <li>陣容評分的模組分來自 <code>module_scores_export.csv</code>（Random Forest 特徵工程 pipeline）</li>
+      </ul>
+    </div>
+  </details>
+
+</section>
+
+{% elif pool_report and pool_report.status == "error" %}
+<section class="card">
+  <h2>卡池分析</h2>
+  <p class="empty">{{ pool_report.message }}</p>
 </section>
 {% endif %}

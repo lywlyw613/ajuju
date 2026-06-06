@@ -26,6 +26,7 @@ from services.catalog import (
     get_gacha_pool,
     search_characters,
 )
+from services.gacha_explanation_engine import rank_all_pools
 from services.gacha_pools import list_pool_names, pools_with_ssr, resolve_pool_key
 from services.pool_analysis import analyze_pool
 from services.roster_analysis import analyze_roster
@@ -127,6 +128,11 @@ def _gacha_context(
     characters = get_gacha_pool(query, pool_key=pool_key)
     display_pool = POOL_NAME if pool_key == DEFAULT_POOL_KEY else pool_key
     lineup = analyze_roster(selected_list) if selected_list else None
+    pool_report = pool_report or analyze_pool(
+        pool_key,
+        selected_list,
+        characters=characters,
+    )
     return {
         "title": APP_TITLE,
         "pool_name": display_pool,
@@ -137,7 +143,7 @@ def _gacha_context(
         "selected_ids": selected,
         "owned_count": len(selected),
         "lineup": lineup,
-        "pool_report": pool_report or analyze_pool(characters, display_pool),
+        "pool_report": pool_report,
         "saved_message": saved_message,
     }
 
@@ -192,6 +198,26 @@ async def gacha_pool_page(
         request,
         "gacha_pool.html",
         _gacha_context("", selected, pool_key),
+    )
+
+
+@app.get("/gacha/rankings", response_class=HTMLResponse)
+async def gacha_rankings_page(
+    request: Request,
+    pool: str = Query("", alias="pool"),
+):
+    pool_key = resolve_pool_key(pool) or DEFAULT_POOL_KEY
+    selected = _load_owned_session(request)
+    rankings = rank_all_pools(selected)
+    return templates.TemplateResponse(
+        request,
+        "gacha_rankings.html",
+        {
+            "title": APP_TITLE,
+            "pool_key": pool_key,
+            "owned_count": len(selected),
+            "rankings": rankings,
+        },
     )
 
 

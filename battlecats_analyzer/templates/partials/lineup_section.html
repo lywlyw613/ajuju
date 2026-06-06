@@ -42,6 +42,17 @@
   {% else %}
   <p class="empty" style="padding:1rem 0">勾選的角色尚無模組分資料，無法計算陣容評分。</p>
   {% endif %}
+
+  <details class="guide-hint data-source-hint">
+    <summary>陣容分數從哪來？</summary>
+    <div class="guide-body">
+      <ul>
+        <li>資料：<code>data/module_scores_export.csv</code>（模組1/2/3 分數，0–10）</li>
+        <li>計算：勾選角色的三模組<strong>平均</strong>，再換算綜合等第</li>
+        <li>程式：<code>services/roster_analysis.py</code>（Random Forest 特徵工程產出模組分）</li>
+      </ul>
+    </div>
+  </details>
 </section>
 {% elif owned_count == 0 %}
 <section class="card">

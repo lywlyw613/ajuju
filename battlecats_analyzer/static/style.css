@@ -1238,6 +1238,282 @@ main {
   text-decoration: underline;
 }
 
+.pool-rec-hero {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.85rem 0.9rem;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 12px;
+  border: 1px solid rgba(180, 76, 57, 0.22);
+}
+
+.pool-rec-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pool-rec-value {
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.35;
+  margin-top: 0.25rem;
+}
+
+.pool-explain-block {
+  margin: 0.65rem 0 0.85rem;
+}
+
+.pool-explain-line {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  margin: 0 0 0.55rem;
+}
+
+.pool-explain-core {
+  font-weight: 700;
+}
+
+.pool-explain-risk {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.pool-stats-grid {
+  margin-bottom: 0.85rem;
+}
+
+.pocket-section {
+  margin-top: 0.5rem;
+}
+
+.pocket-heading {
+  font-size: 0.85rem;
+  margin: 0 0 0.5rem;
+}
+
+.pocket-block {
+  margin-bottom: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.pocket-god {
+  border-left: 3px solid #c0392b;
+}
+
+.pocket-s {
+  border-left: 3px solid var(--accent);
+}
+
+.pocket-a {
+  border-left: 3px solid #8a7a5a;
+}
+
+.pocket-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.pocket-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.pocket-list-compact {
+  columns: 2;
+  column-gap: 0.75rem;
+}
+
+.pocket-empty {
+  padding: 0.5rem 0;
+  font-size: 0.78rem;
+}
+
+.data-source-hint {
+  margin-top: 0.85rem;
+}
+
+.data-source-hint code {
+  font-size: 0.68rem;
+  word-break: break-all;
+}
+
+.insight-tile-tag-lg {
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin-top: 0.35rem;
+}
+
+/* --- DA_ML_PoolScore 引擎原始數據 --- */
+.engine-output-card {
+  margin-top: 0.85rem;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
+}
+
+.engine-intro {
+  font-size: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.engine-intro code,
+.engine-note code {
+  font-size: 0.68rem;
+  word-break: break-all;
+}
+
+.engine-threshold-banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.85rem;
+  padding: 0.55rem 0.65rem;
+  margin-bottom: 0.65rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  font-size: 0.72rem;
+}
+
+.engine-threshold-banner strong {
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.engine-metrics-grid {
+  margin-bottom: 0.75rem;
+}
+
+.engine-mono {
+  font-family: ui-monospace, Consolas, monospace;
+  font-weight: 800;
+}
+
+.engine-block {
+  margin-top: 0.55rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 0.45rem;
+}
+
+.engine-block summary {
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0.35rem 0;
+}
+
+.engine-block-body {
+  padding: 0.35rem 0 0.65rem;
+}
+
+.engine-note {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0 0 0.55rem;
+}
+
+.engine-subheading {
+  font-size: 0.78rem;
+  margin: 0.65rem 0 0.35rem;
+}
+
+.engine-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 0.5rem;
+}
+
+.engine-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.68rem;
+  min-width: 520px;
+}
+
+.engine-table th,
+.engine-table td {
+  padding: 0.35rem 0.4rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  text-align: left;
+  vertical-align: top;
+}
+
+.engine-table th {
+  font-weight: 800;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.engine-table td:nth-child(3),
+.engine-table td:nth-child(5),
+.engine-table td:nth-child(6) {
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.engine-table .row-owned {
+  opacity: 0.72;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.engine-table .row-trap {
+  color: var(--muted);
+}
+
+.engine-table .row-current-pool {
+  background: rgba(180, 76, 57, 0.1);
+}
+
+.engine-json-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.engine-json-item {
+  padding: 0.45rem 0.55rem;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+}
+
+.engine-json-key {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.engine-json-val {
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-top: 0.15rem;
+}
+
+.engine-explain-json p {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  margin: 0 0 0.55rem;
+}
+
+.tag-owned,
+.tag-trap {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  margin-right: 0.25rem;
+}
+
+.tag-owned {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.tag-trap {
+  background: rgba(180, 76, 57, 0.12);
+  color: var(--accent);
+}
+
 /* --- 外層舞台（手機／桌面共用） --- */
 .app-stage {
   width: 100%;

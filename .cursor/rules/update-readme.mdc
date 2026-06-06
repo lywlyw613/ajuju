@@ -1,0 +1,12 @@
+---
+description: README 在 Ajuju 根目錄，改 ajuju_mission 時同步更新 ../README.md
+alwaysApply: true
+---
+
+# README 位置
+
+正式文件：**`Ajuju/README.md`**（本 repo 的上一層，不在 `ajuju_mission/` 內）。
+
+改 `battlecats_analyzer/` 或本 repo 內任何會影響使用者的內容時，請同步更新 **`../README.md`** 的 Changelog 與相關章節。
+
+勿在 `ajuju_mission/README.md` 撰寫完整文件（該檔僅為指向上一層的短連結）。

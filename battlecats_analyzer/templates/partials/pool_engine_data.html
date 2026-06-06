@@ -1,0 +1,193 @@
+{% macro roster_table(rows, heading) %}
+{% if rows %}
+<h4 class="engine-subheading">{{ heading }}</h4>
+<div class="engine-table-wrap">
+  <table class="engine-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>角色</th>
+        <th>綜合評分</th>
+        <th>持有</th>
+        <th>單抽機率</th>
+        <th>EV 貢獻</th>
+        <th>分級</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in rows %}
+      <tr class="{% if c.owned %}row-owned{% elif c.pocket_tier == 'trap' %}row-trap{% endif %}">
+        <td>{{ c.id }}</td>
+        <td><a href="/character/{{ c.id }}">{{ c.name }}</a></td>
+        <td>{{ c.score }}</td>
+        <td>{% if c.owned %}✓{% else %}—{% endif %}</td>
+        <td>{{ c.p_weight_pct }}</td>
+        <td>
+          <span title="初始">{{ c.ev_initial_contrib }}</span>
+          →
+          <strong>{{ c.ev_current_contrib }}</strong>
+        </td>
+        <td>
+          {% if c.pocket_tier == 'owned' %}已擁有
+          {% elif c.pocket_tier == 'god' %}神級
+          {% elif c.pocket_tier == 's' %}S
+          {% elif c.pocket_tier == 'a' %}A
+          {% else %}弱勢{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro rankings_table(rows, highlight_pool=None) %}
+<div class="engine-table-wrap">
+  <table class="engine-table engine-table-rank">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>卡池</th>
+        <th>最新 EV</th>
+        <th>初始 EV</th>
+        <th>SSR</th>
+        <th>已擁有</th>
+        <th>SSSR</th>
+        <th>已擁有</th>
+        <th>推薦指數</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr {% if highlight_pool and row.pool_name == highlight_pool %}class="row-current-pool"{% endif %}>
+        <td>{{ row.rank }}</td>
+        <td>
+          {% if highlight_pool %}
+          <a href="/gacha/pool?pool={{ row.pool_name|urlencode }}">{{ row.pool_name }}</a>
+          {% else %}
+          {{ row.pool_name }}
+          {% endif %}
+        </td>
+        <td><strong>{{ row.ev_current }}</strong></td>
+        <td>{{ row.ev_initial }}</td>
+        <td>{{ row.total_ssr }}</td>
+        <td>{{ row.owned_ssr }}</td>
+        <td>{{ row.total_sssr }}</td>
+        <td>{{ row.owned_sssr }}</td>
+        <td>{{ row.recommendation_level }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
+{% if pool_report and pool_report.status == "success" %}
+<section class="card engine-output-card">
+
+  <div class="section-head-row">
+    <h2>引擎原始數據</h2>
+    <span class="section-sub-badge">DA_ML_PoolScore</span>
+  </div>
+
+  <p class="hero-sub engine-intro">
+    以下欄位與 notebook <code>calculate_gacha_explanation_engine</code> / 互動式評估輸出對齊，方便對照程式結果。
+  </p>
+
+  <div class="engine-threshold-banner">
+    <span>PR40 門檻：<strong>{{ pool_report.thresholds.pr40 }}</strong></span>
+    <span>PR80 門檻：<strong>{{ pool_report.thresholds.pr80 }}</strong></span>
+    {% if pool_report.pool_rank %}
+    <span>此池排行：<strong>#{{ pool_report.pool_rank }}</strong> / {{ pool_report.total_pools }}</span>
+    {% endif %}
+  </div>
+
+  <div class="stats-grid engine-metrics-grid">
+    <div class="stat-item">
+      <div class="label">初始期望值 ev_initial</div>
+      <div class="val engine-mono">{{ pool_report.ev_initial }}</div>
+    </div>
+    <div class="stat-item stat-item-overall">
+      <div class="label">當前期望值 ev_current</div>
+      <div class="val engine-mono">{{ pool_report.ev_current }}</div>
+    </div>
+    <div class="stat-item">
+      <div class="label">推薦指數</div>
+      <div class="val" style="font-size:0.82rem;line-height:1.35">{{ pool_report.recommendation_level }}</div>
+    </div>
+    <div class="stat-item">
+      <div class="label">勸退類型 skip_reason</div>
+      <div class="val" style="font-size:0.78rem">{{ pool_report.skip_reason_label or '—' }}</div>
+    </div>
+  </div>
+
+  <details class="engine-block" open>
+    <summary>卡池角色清單（含機率 × 評分 → EV 貢獻）</summary>
+    <div class="engine-block-body">
+      <p class="engine-note">公式：每隻 EV 貢獻 = (SSR 5% 或 SSSR 0.3%) ÷ 池內同稀有度數量 × 綜合評分；已擁有者當前 EV 貢獻 = 0。</p>
+      {{ roster_table(pool_report.ssr_roster, '超激稀有 SSR（' ~ pool_report.stats.total_ssr ~ ' 隻）') }}
+      {{ roster_table(pool_report.sssr_roster, '傳說稀有 SSSR（' ~ pool_report.stats.total_sssr ~ ' 隻）') }}
+    </div>
+  </details>
+
+  {% set pk = pool_report.pockets %}
+  <details class="engine-block" open>
+    <summary>pockets 口袋分類</summary>
+    <div class="engine-block-body">
+      <div class="engine-json-grid">
+        <div class="engine-json-item">
+          <div class="engine-json-key">god_unowned</div>
+          <div class="engine-json-val">{{ pk.god_unowned|length }} 隻</div>
+        </div>
+        <div class="engine-json-item">
+          <div class="engine-json-key">s_unowned</div>
+          <div class="engine-json-val">{{ pk.s_unowned|length }} 隻</div>
+        </div>
+        <div class="engine-json-item">
+          <div class="engine-json-key">a_unowned</div>
+          <div class="engine-json-val">{{ pk.a_unowned|length }} 隻</div>
+        </div>
+        <div class="engine-json-item">
+          <div class="engine-json-key">owned_or_trap</div>
+          <div class="engine-json-val">{{ pk.owned_or_trap_count }} 隻</div>
+        </div>
+      </div>
+      {% if pk.owned_or_trap %}
+      <ul class="pocket-list pocket-list-compact" style="margin-top:0.5rem">
+        {% for c in pk.owned_or_trap %}
+        <li>
+          {% if c.owned %}<span class="tag-owned">已擁有</span>{% else %}<span class="tag-trap">弱勢</span>{% endif %}
+          <a href="/character/{{ c.id }}">{{ c.name }}</a> · {{ c.score }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </details>
+
+  {% set exp = pool_report.display_explanations %}
+  <details class="engine-block">
+    <summary>display_explanations 文案</summary>
+    <div class="engine-block-body engine-explain-json">
+      <p><strong>core_reason</strong><br>{{ exp.core_reason or '—' }}</p>
+      <p><strong>sub_reason</strong><br>{{ exp.sub_reason or '—' }}</p>
+      <p><strong>risk_hint</strong><br>{{ exp.risk_hint or '—' }}</p>
+    </div>
+  </details>
+
+  {% if pool_report.rankings_preview %}
+  <details class="engine-block">
+    <summary>全卡池 EV 排行 Top 15（gacha_recommendation_system_pr）</summary>
+    <div class="engine-block-body">
+      <p class="engine-note">依你 Session 持有清單計算所有卡池的「最新期望值」，與 notebook Cell 0 輸出相同。</p>
+      {{ rankings_table(pool_report.rankings_preview, pool_report.pool_key) }}
+      <p class="hero-sub" style="margin-top:0.65rem;font-size:0.75rem">
+        <a href="/gacha/rankings?pool={{ pool_key|urlencode }}">查看完整 {{ pool_report.total_pools }} 池排行 →</a>
+      </p>
+    </div>
+  </details>
+  {% endif %}
+
+</section>
+{% endif %}

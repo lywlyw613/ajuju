@@ -6,30 +6,16 @@
 
 {% block content %}
 <h2 class="hero-title">{{ pool_name }}</h2>
-<p class="hero-sub">整池分析 · 顯示 {{ characters|length }} 隻 SSR / SSSR</p>
+<p class="hero-sub">卡池分析 · 依 Session 持有 {{ owned_count }} 隻計算</p>
 
 <a class="back-link" href="/gacha?pool={{ pool_key|urlencode }}">← 返回卡池角色列表</a>
 
-{% if owned_count > 0 and lineup and lineup.count > 0 %}
-{% set lineup_score = lineup.lineup_score_label.split(' / ') %}
-<div class="gacha-insights gacha-insights-single">
-  <a class="insight-tile insight-tile-roster" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
-    <div class="insight-tile-main">
-      <div class="insight-tile-head">
-        <span class="insight-tile-icon" aria-hidden="true">★</span>
-        <span class="insight-tile-title">你的陣容評分</span>
-        <span class="priority-badge">優先</span>
-      </div>
-      <div class="insight-tile-metrics">
-        <span class="insight-tile-num">{{ lineup_score[0] }}</span>
-        {% if lineup_score|length > 1 %}<span class="insight-tile-denom">/ {{ lineup_score[1] }}</span>{% endif %}
-      </div>
-      <div class="insight-tile-tag">{{ lineup.tier }}</div>
-    </div>
-    <span class="insight-tile-arrow" aria-hidden="true">›</span>
-  </a>
-</div>
-{% endif %}
-
 {% include "partials/pool_report_section.html" %}
+
+{% include "partials/pool_engine_data.html" %}
+
+<p class="hero-sub" style="margin-top:0.75rem;font-size:0.75rem">
+  分析會讀取你在卡池頁勾選的持有角色。若要調整，請回<a href="/gacha?pool={{ pool_key|urlencode }}">卡池頁</a>勾選後再查看。
+  個人三模組陣容強度請看<a href="/gacha/lineup?pool={{ pool_key|urlencode }}">陣容評分</a>。
+</p>
 {% endblock %}
