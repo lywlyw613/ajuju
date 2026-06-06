@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="card">
+<section class="card carousel-card">
   <h2>近期卡池</h2>
   <p class="hero-sub">{{ pool_name }} · 精選 SSR / SSSR</p>
   <div class="carousel">
@@ -9,10 +9,13 @@
       <div class="img-wrap">
         <img src="{{ s.image_url }}" alt="{{ s.name }}" loading="lazy" />
       </div>
-      <div class="cap">{{ s.name }}<br>
-        <span style="font-weight:400;color:var(--muted)">{{ s.rarity }}</span>
-        {% if s.stars and s.stars != '—' %}<span class="star-row star-sm">{{ s.stars }}</span>{% endif %}
-        {% if s.grade and s.grade != '—' %}<span class="grade-badge grade-{{ s.grade }}">{{ s.grade }}</span>{% endif %}
+      <div class="cap">
+        <div class="cap-name">{{ s.name }}</div>
+        <div class="cap-meta">
+          <span class="rarity rarity-{{ s.rarity }}">{{ s.rarity }}</span>
+          {% if s.stars and s.stars != '—' %}<span class="star-row star-sm">{{ s.stars }}</span>{% endif %}
+          {% if s.grade and s.grade != '—' %}<span class="grade-badge grade-{{ s.grade }}">{{ s.grade }}</span>{% endif %}
+        </div>
       </div>
     </a>
     {% else %}
