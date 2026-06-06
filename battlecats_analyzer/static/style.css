@@ -667,6 +667,40 @@ main {
   max-width: 100%;
 }
 
+.explanation-summary {
+  margin: 0.45rem 0 0.55rem;
+  padding: 0.45rem 0.55rem;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  font-size: 0.76rem;
+}
+
+.explanation-expand {
+  margin-top: 0.35rem;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.explanation-expand summary {
+  cursor: pointer;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  list-style: none;
+  user-select: none;
+}
+
+.explanation-expand summary::-webkit-details-marker {
+  display: none;
+}
+
+.explanation-expand .explanation-list {
+  padding: 0 0.35rem 0.45rem;
+}
+
 .explanation-list {
   list-style: none;
   margin: 0.5rem 0 0;

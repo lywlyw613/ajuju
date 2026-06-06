@@ -70,8 +70,15 @@
 
     <div class="pool-report-label">Explanation</div>
 
+    {% if pool_report.explanation_summary %}
+    <div class="explanation-summary">
+      <span class="explanation-head">{{ pool_report.explanation_summary.head }}</span>
+      <span class="explanation-points">{{ pool_report.explanation_summary.points|join(' · ') }}</span>
+    </div>
+    {% endif %}
+
     <ul class="explanation-list">
-      {% for item in pool_report.explanation_items %}
+      {% for item in pool_report.explanation_visible %}
       <li>
         <span class="explanation-head">{{ item.head }}</span>
         {% if item.points %}
@@ -80,6 +87,22 @@
       </li>
       {% endfor %}
     </ul>
+
+    {% if pool_report.explanation_has_more %}
+    <details class="explanation-expand">
+      <summary>展開列表（另有 {{ pool_report.explanation_hidden_count }} 項）</summary>
+      <ul class="explanation-list">
+        {% for item in pool_report.explanation_hidden %}
+        <li>
+          <span class="explanation-head">{{ item.head }}</span>
+          {% if item.points %}
+          <span class="explanation-points">{{ item.points|join(' · ') }}</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endif %}
 
   </div>
 

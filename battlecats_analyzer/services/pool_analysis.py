@@ -32,54 +32,80 @@ def _mock_recommendation(pool_score: float) -> str:
     return "觀望為宜"
 
 
-def _build_explanation_items(characters: list[dict], pool_name: str) -> list[dict]:
+def _character_explanation_item(c: dict) -> dict | None:
+    review = get_review(c["id"])
+    name = c.get("name") or (review or {}).get("name") or c["id"]
+    grade = (c.get("tier") or {}).get("composite_grade") or c.get("grade") or ""
+    head = f"{name}（{grade}）" if grade and grade != "—" else name
+
+    if review:
+        points = summarize_review_bullets(review, max_points=3)
+    else:
+        points = []
+
+    if not points:
+        fallback: list[str] = []
+        if c.get("rarity"):
+            fallback.append(str(c["rarity"]))
+        score = (c.get("tier") or {}).get("composite_score")
+        if score is not None:
+            fallback.append(f"評分 {score:.2f}")
+        if not fallback:
+            fallback.append("尚無評語資料")
+        points = fallback
+
+    return {"head": head, "points": points, "id": c["id"]}
+
+
+def _build_explanation_items(characters: list[dict]) -> tuple[dict, list[dict]]:
     ranked = sorted(
         characters,
-        key=lambda c: (c.get("tier") or {}).get("composite_score") or 0,
-        reverse=True,
+        key=lambda c: (
+            -((c.get("tier") or {}).get("composite_score") or 0),
+            c.get("name") or c["id"],
+        ),
     )
-    items: list[dict] = []
 
+    items: list[dict] = []
     for c in ranked:
-        review = get_review(c["id"])
-        if not review:
-            continue
-        name = c.get("name") or review.get("name") or c["id"]
-        grade = (c.get("tier") or {}).get("composite_grade") or c.get("grade") or ""
-        points = summarize_review_bullets(review, max_points=3)
-        if not points:
-            continue
-        head = f"{name}（{grade}）" if grade and grade != "—" else name
-        items.append({"head": head, "points": points})
-        if len(items) >= 3:
-            break
+        item = _character_explanation_item(c)
+        if item:
+            items.append(item)
 
     s_count = sum(
         1 for c in characters if (c.get("tier") or {}).get("composite_grade") == "S"
     )
-    items.append(
-        {
-            "head": "卡池概況",
-            "points": [f"共 {len(characters)} 隻 SSR/SSSR", f"S 等第 {s_count} 隻"],
-        }
-    )
-    return items
+    summary = {
+        "head": "卡池概況",
+        "points": [f"共 {len(characters)} 隻 SSR/SSSR", f"S 等第 {s_count} 隻"],
+    }
+    return summary, items
 
 
 def analyze_pool(characters: list[dict], pool_name: str) -> dict:
     pool_score = _mock_pool_score(characters)
     recommendation = _mock_recommendation(pool_score)
-    explanation_items = _build_explanation_items(characters, pool_name)
+    explanation_summary, explanation_items = _build_explanation_items(characters)
 
     if not explanation_items:
         explanation_items = [
-            {"head": "卡池概況", "points": ["尚無角色評語資料", f"共 {len(characters)} 隻 SSR/SSSR"]}
+            {
+                "head": "此卡池",
+                "points": ["尚無可條列的角色資料"],
+                "id": "",
+            }
         ]
 
+    visible_count = 5
     return {
         "pool_score": pool_score,
         "pool_score_label": f"{pool_score} / 100",
         "is_mock_score": True,
         "recommendation": recommendation,
+        "explanation_summary": explanation_summary,
         "explanation_items": explanation_items,
+        "explanation_visible": explanation_items[:visible_count],
+        "explanation_hidden": explanation_items[visible_count:],
+        "explanation_has_more": len(explanation_items) > visible_count,
+        "explanation_hidden_count": max(0, len(explanation_items) - visible_count),
     }
