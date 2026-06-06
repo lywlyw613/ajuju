@@ -1,0 +1,54 @@
+{% from "partials/gacha_macros.html" import explanation_row %}
+{% if pool_report %}
+<section class="card pool-report pool-report-secondary">
+  <div class="section-head-row">
+    <h2>卡池分析</h2>
+    <span class="section-sub-badge">整池參考</span>
+  </div>
+
+  <p class="hero-sub" style="margin-bottom:0.75rem">以下為整個卡池的概略評價；若已勾選持有角色，請<strong>優先看陣容評分</strong>。</p>
+
+  <div class="pool-report-grid">
+    <div class="pool-report-block">
+      <div class="pool-report-label">Pool Score</div>
+      <div class="pool-report-value">{{ pool_report.pool_score_label }}</div>
+      {% if pool_report.is_mock_score %}
+      <div class="mock-tag">模擬分數 · 待後端模型串接</div>
+      {% endif %}
+    </div>
+
+    <div class="pool-report-block">
+      <div class="pool-report-label">Recommendation</div>
+      <div class="pool-report-value rec">{{ pool_report.recommendation }}</div>
+    </div>
+  </div>
+
+  <div class="pool-report-block explanation-block">
+    <div class="pool-report-label">Explanation</div>
+
+    {% if pool_report.explanation_summary %}
+    <div class="explanation-summary">
+      <span class="explanation-head">{{ pool_report.explanation_summary.head }}</span>
+      <span class="explanation-points">{{ pool_report.explanation_summary.points|join(' · ') }}</span>
+    </div>
+    {% endif %}
+
+    <ul class="explanation-list">
+      {% for item in pool_report.explanation_visible %}
+      {{ explanation_row(item) }}
+      {% endfor %}
+    </ul>
+
+    {% if pool_report.explanation_has_more %}
+    <details class="explanation-expand">
+      <summary>展開列表（另有 {{ pool_report.explanation_hidden_count }} 項）</summary>
+      <ul class="explanation-list">
+        {% for item in pool_report.explanation_hidden %}
+        {{ explanation_row(item) }}
+        {% endfor %}
+      </ul>
+    </details>
+    {% endif %}
+  </div>
+</section>
+{% endif %}

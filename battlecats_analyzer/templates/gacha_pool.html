@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+<div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; <a href="/gacha?pool={{ pool_key|urlencode }}">卡池</a> &gt;&gt; 卡池分析</div>
+{% endblock %}
+
+{% block content %}
+<h2 class="hero-title">{{ pool_name }}</h2>
+<p class="hero-sub">整池分析 · 顯示 {{ characters|length }} 隻 SSR / SSSR</p>
+
+<a class="back-link" href="/gacha?pool={{ pool_key|urlencode }}">← 返回卡池角色列表</a>
+
+{% if owned_count > 0 and lineup and lineup.count > 0 %}
+<a class="insight-card insight-card-primary insight-card-inline" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
+  <div class="insight-head">你的陣容評分 <span class="priority-badge">優先參考</span></div>
+  <div class="insight-value">{{ lineup.lineup_score_label }} · {{ lineup.tier }}</div>
+  <div class="insight-cta">查看陣容評分 →</div>
+</a>
+{% endif %}
+
+{% include "partials/pool_report_section.html" %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{% macro explanation_row(item) %}
+<li>
+  <div class="explanation-head">
+    <strong class="char-name-bold">{{ item.name }}</strong>{% if item.grade %}<span class="explanation-grade">（{{ item.grade }}）</span>{% endif %}
+  </div>
+  {% if item.points %}
+  <div class="explanation-points">{{ item.points|join(' · ') }}</div>
+  {% endif %}
+</li>
+{% endmacro %}

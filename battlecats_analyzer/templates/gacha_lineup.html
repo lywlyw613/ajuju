@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+<div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; <a href="/gacha?pool={{ pool_key|urlencode }}">卡池</a> &gt;&gt; 陣容評分</div>
+{% endblock %}
+
+{% block content %}
+<h2 class="hero-title">{{ pool_name }}</h2>
+<p class="hero-sub">陣容評分 · 已儲存持有 {{ owned_count }} 隻</p>
+
+<a class="back-link" href="/gacha?pool={{ pool_key|urlencode }}">← 返回卡池角色列表</a>
+
+{% include "partials/lineup_section.html" %}
+
+{% if lineup and owned_count > 0 and lineup.count > 0 %}
+<p class="hero-sub" style="margin-top:0.75rem;font-size:0.75rem">分數依目前 Session 勾選計算。若要調整持有，請回<a href="/gacha?pool={{ pool_key|urlencode }}">卡池頁</a>勾選後再回來查看。</p>
+{% endif %}
+{% endblock %}

@@ -2,22 +2,11 @@
 
 {% block breadcrumb %}
 
-<div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; 卡池分析</div>
+<div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; 卡池</div>
 
 {% endblock %}
 
 {% block content %}
-{% macro explanation_row(item) %}
-<li>
-  <div class="explanation-head">
-    <strong class="char-name-bold">{{ item.name }}</strong>{% if item.grade %}<span class="explanation-grade">（{{ item.grade }}）</span>{% endif %}
-  </div>
-  {% if item.points %}
-  <div class="explanation-points">{{ item.points|join(' · ') }}</div>
-  {% endif %}
-</li>
-{% endmacro %}
-
 <h2 class="hero-title">{{ pool_name }}</h2>
 
 <p class="hero-sub">SSR / SSSR · 顯示 {{ characters|length }} 隻 · 已儲存持有 {{ owned_count }} 隻</p>
@@ -25,7 +14,7 @@
 <details class="guide-hint">
   <summary>不會用？點這裡看快速提示</summary>
   <div class="guide-body">
-    ① 上方選卡池 → ② 勾選已有角色（陣容評分會自動更新）→ ③ 需要時再看下方整池分析。完整教學請回<a href="/">首頁</a>。
+    ① 上方選卡池 → ② 勾選已有角色 → ③ 點「陣容評分」或「卡池分析」查看詳情。完整教學請回<a href="/">首頁</a>。
   </div>
 </details>
 
@@ -49,129 +38,35 @@
 
 
 
-{% if lineup and owned_count > 0 %}
-
-<section class="card roster-primary">
-
-  <div class="section-head-row">
-    <h2>陣容評分</h2>
-    <span class="priority-badge">優先參考</span>
-  </div>
-
-  <p class="hero-sub">依你勾選的 <strong>{{ owned_count }}</strong> 隻持有角色計算
-    {% if lineup.missing %}（{{ lineup.missing|length }} 隻尚無模組分資料）{% endif %}
-  </p>
-
-  {% if lineup.count > 0 %}
-  <div class="lineup-score-hero">
-    <div>
-      <div class="lineup-score-label">陣容綜合分</div>
-      <div class="lineup-score-value">{{ lineup.lineup_score_label }}</div>
-    </div>
-    <span class="tier-badge tier-lg">{{ lineup.tier }}</span>
-  </div>
-
-  <p class="roster-summary">{{ lineup.summary }}</p>
-
-  <ul class="mod-notes">
-    {% for note in lineup.mod_notes %}<li>{{ note }}</li>{% endfor %}
-  </ul>
-
-  {% if lineup.module_rows %}
-  <div class="stats-grid lineup-module-grid">
-    {% for row in lineup.module_rows %}
-    <div class="stat-item">
-      <div class="label">{{ row.label }}</div>
-      <div class="val">{{ row.avg or '—' }}<span class="stat-grade"> · {{ row.grade }}</span></div>
-    </div>
-    {% endfor %}
-    <div class="stat-item stat-item-overall">
-      <div class="label">陣容綜合平均</div>
-      <div class="val">{{ lineup.averages.overall or '—' }}</div>
-    </div>
-  </div>
-  {% endif %}
-
+<div class="gacha-insights">
+  {% if owned_count > 0 and lineup and lineup.count > 0 %}
+  <a class="insight-card insight-card-primary" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
+    <div class="insight-head">陣容評分 <span class="priority-badge">優先參考</span></div>
+    <div class="insight-value">{{ lineup.lineup_score_label }} · {{ lineup.tier }}</div>
+    <div class="insight-cta">查看詳情 →</div>
+  </a>
+  {% elif owned_count > 0 %}
+  <a class="insight-card insight-card-muted" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
+    <div class="insight-head">陣容評分</div>
+    <div class="insight-value">尚無模組分資料</div>
+    <div class="insight-cta">查看詳情 →</div>
+  </a>
   {% else %}
-  <p class="empty" style="padding:1rem 0">勾選的角色尚無模組分資料，無法計算陣容評分。</p>
+  <a class="insight-card insight-card-muted" href="/gacha/lineup?pool={{ pool_key|urlencode }}">
+    <div class="insight-head">陣容評分</div>
+    <div class="insight-value">勾選持有角色後查看</div>
+    <div class="insight-cta">前往 →</div>
+  </a>
   {% endif %}
 
-</section>
-
-{% endif %}
-
-
-
-{% if pool_report %}
-
-<section class="card pool-report pool-report-secondary">
-
-  <div class="section-head-row">
-    <h2>卡池分析</h2>
-    <span class="section-sub-badge">整池參考</span>
-  </div>
-
-  <p class="hero-sub" style="margin-bottom:0.75rem">以下為整個卡池的概略評價；若已勾選持有角色，請<strong>優先看上方陣容評分</strong>。</p>
-
-  <div class="pool-report-grid">
-
-    <div class="pool-report-block">
-
-      <div class="pool-report-label">Pool Score</div>
-
-      <div class="pool-report-value">{{ pool_report.pool_score_label }}</div>
-
-      {% if pool_report.is_mock_score %}
-
-      <div class="mock-tag">模擬分數 · 待後端模型串接</div>
-
-      {% endif %}
-
-    </div>
-
-    <div class="pool-report-block">
-
-      <div class="pool-report-label">Recommendation</div>
-
-      <div class="pool-report-value rec">{{ pool_report.recommendation }}</div>
-
-    </div>
-
-  </div>
-
-  <div class="pool-report-block explanation-block">
-
-    <div class="pool-report-label">Explanation</div>
-
-    {% if pool_report.explanation_summary %}
-    <div class="explanation-summary">
-      <span class="explanation-head">{{ pool_report.explanation_summary.head }}</span>
-      <span class="explanation-points">{{ pool_report.explanation_summary.points|join(' · ') }}</span>
-    </div>
-    {% endif %}
-
-    <ul class="explanation-list">
-      {% for item in pool_report.explanation_visible %}
-      {{ explanation_row(item) }}
-      {% endfor %}
-    </ul>
-
-    {% if pool_report.explanation_has_more %}
-    <details class="explanation-expand">
-      <summary>展開列表（另有 {{ pool_report.explanation_hidden_count }} 項）</summary>
-      <ul class="explanation-list">
-        {% for item in pool_report.explanation_hidden %}
-        {{ explanation_row(item) }}
-        {% endfor %}
-      </ul>
-    </details>
-    {% endif %}
-
-  </div>
-
-</section>
-
-{% endif %}
+  {% if pool_report %}
+  <a class="insight-card" href="/gacha/pool?pool={{ pool_key|urlencode }}">
+    <div class="insight-head">卡池分析 <span class="section-sub-badge">整池參考</span></div>
+    <div class="insight-value">{{ pool_report.pool_score_label }} · {{ pool_report.recommendation }}</div>
+    <div class="insight-cta">查看詳情 →</div>
+  </a>
+  {% endif %}
+</div>
 
 
 

@@ -1,0 +1,51 @@
+{% if lineup and owned_count > 0 %}
+<section class="card roster-primary">
+  <div class="section-head-row">
+    <h2>陣容評分</h2>
+    <span class="priority-badge">優先參考</span>
+  </div>
+
+  <p class="hero-sub">依你勾選的 <strong>{{ owned_count }}</strong> 隻持有角色計算
+    {% if lineup.missing %}（{{ lineup.missing|length }} 隻尚無模組分資料）{% endif %}
+  </p>
+
+  {% if lineup.count > 0 %}
+  <div class="lineup-score-hero">
+    <div>
+      <div class="lineup-score-label">陣容綜合分</div>
+      <div class="lineup-score-value">{{ lineup.lineup_score_label }}</div>
+    </div>
+    <span class="tier-badge tier-lg">{{ lineup.tier }}</span>
+  </div>
+
+  <p class="roster-summary">{{ lineup.summary }}</p>
+
+  <ul class="mod-notes">
+    {% for note in lineup.mod_notes %}<li>{{ note }}</li>{% endfor %}
+  </ul>
+
+  {% if lineup.module_rows %}
+  <div class="stats-grid lineup-module-grid">
+    {% for row in lineup.module_rows %}
+    <div class="stat-item">
+      <div class="label">{{ row.label }}</div>
+      <div class="val">{{ row.avg or '—' }}<span class="stat-grade"> · {{ row.grade }}</span></div>
+    </div>
+    {% endfor %}
+    <div class="stat-item stat-item-overall">
+      <div class="label">陣容綜合平均</div>
+      <div class="val">{{ lineup.averages.overall or '—' }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% else %}
+  <p class="empty" style="padding:1rem 0">勾選的角色尚無模組分資料，無法計算陣容評分。</p>
+  {% endif %}
+</section>
+{% elif owned_count == 0 %}
+<section class="card">
+  <h2>陣容評分</h2>
+  <p class="empty" style="padding:1rem 0">尚未勾選持有角色。請回<a href="/gacha?pool={{ pool_key|urlencode }}">卡池頁</a>勾選後再查看陣容評分。</p>
+</section>
+{% endif %}

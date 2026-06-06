@@ -167,6 +167,34 @@ async def gacha_page(
     )
 
 
+@app.get("/gacha/lineup", response_class=HTMLResponse)
+async def gacha_lineup_page(
+    request: Request,
+    pool: str = Query("", alias="pool"),
+):
+    pool_key = resolve_pool_key(pool) or DEFAULT_POOL_KEY
+    selected = _load_owned_session(request)
+    return templates.TemplateResponse(
+        request,
+        "gacha_lineup.html",
+        _gacha_context("", selected, pool_key),
+    )
+
+
+@app.get("/gacha/pool", response_class=HTMLResponse)
+async def gacha_pool_page(
+    request: Request,
+    pool: str = Query("", alias="pool"),
+):
+    pool_key = resolve_pool_key(pool) or DEFAULT_POOL_KEY
+    selected = _load_owned_session(request)
+    return templates.TemplateResponse(
+        request,
+        "gacha_pool.html",
+        _gacha_context("", selected, pool_key),
+    )
+
+
 @app.post("/gacha", response_class=HTMLResponse)
 async def gacha_post(
     request: Request,
