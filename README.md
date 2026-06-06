@@ -3,8 +3,8 @@
 > **給組員的一句話**：貓咪大戰爭的「抽卡建議 + 角色強度分析」網站。  
 > 組員用 Python / Notebook 算分、匯出 CSV；網站用 FastAPI 讀檔顯示，**線上不訓練模型**。
 
-**本 README**：GitHub / Render  repo 根目錄（`ajuju_mission/README.md`）。  
-本機工作區另有同步副本：`Ajuju/README.md`（上一層）。**兩邊內容應保持一致。**
+**本 README 位置**：`Ajuju/README.md`（工作區根目錄）  
+**Git / Render 程式根目錄**：`ajuju_mission/`（GitHub: [lywlyw613/ajuju](https://github.com/lywlyw613/ajuju)）
 
 ---
 
@@ -441,6 +441,7 @@ A：batch 排行缺資料預設 2.37 分，單池引擎預設 2.5 分（與 note
 
 | 日期 | 摘要 |
 |------|------|
+| 2026-06-01 | 修復：勾選大量持有後按「更新陣容評分」500（skip_reason_type 順序 bug） |
 | 2026-06-01 | 推送：PoolScore 引擎、引擎原始數據頁、完整 README 至 GitHub |
 | 2026-06-01 | README 移至 `Ajuju/README.md` |
 | 2026-06-01 | 接入 PoolScore 引擎；lineup / pool / rankings 頁；引擎原始數據區 |
@@ -450,8 +451,8 @@ A：batch 排行缺資料預設 2.37 分，單池引擎預設 2.5 分（與 note
 
 ## 12. README 維護規則
 
-- **GitHub / 本 repo 完整版**：`ajuju_mission/README.md`（push 後在網頁可看）
-- **本機工作區副本**：`Ajuju/README.md`（與 repo 內 README 同步）
+- **GitHub / 本 repo 完整版**：`ajuju_mission/README.md`
+- **本機工作區副本**：`Ajuju/README.md`（兩邊應同步）
 - 改路由 / services / data / 組員交付物 → **同步更新本檔** + Changelog
 - Cursor 規則：`Ajuju/.cursor/rules/update-readme.mdc`
 - `ajuju_mission/README.md` 僅保留指向本檔的短連結
