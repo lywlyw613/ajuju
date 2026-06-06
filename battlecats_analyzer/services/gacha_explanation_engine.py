@@ -226,6 +226,13 @@ def calculate_gacha_explanation_engine(pool_name: str, owned_ids: list[str] | No
 
     recommendation_level = _recommendation_for_ev(ev_current)
 
+    skip_reason_type = "none"
+    if recommendation_level.startswith("❌"):
+        if ev_initial >= PR40_THRESHOLD:
+            skip_reason_type = "high_duplication"
+        else:
+            skip_reason_type = "low_quality"
+
     explanations = {"core_reason": "", "sub_reason": "", "risk_hint": ""}
     dup_rate_percent = f"{round(((owned_ssr_count + owned_sssr_count) / total_pool_chars) * 100, 1)}%"
 
@@ -294,13 +301,6 @@ def calculate_gacha_explanation_engine(pool_name: str, owned_ids: list[str] | No
             explanations["sub_reason"] = (
                 "💡 建議：此卡池純屬時代眼淚或地雷卡池，建議完全無視，儲存資源等候超極貓祭等大活動。"
             )
-
-    skip_reason_type = "none"
-    if recommendation_level.startswith("❌"):
-        if ev_initial >= PR40_THRESHOLD:
-            skip_reason_type = "high_duplication"
-        else:
-            skip_reason_type = "low_quality"
 
     ssr_roster = [c for c in character_roster if c["rarity"] == "SSR"]
     sssr_roster = [c for c in character_roster if c["rarity"] == "SSSR"]

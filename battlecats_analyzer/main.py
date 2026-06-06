@@ -98,8 +98,18 @@ async def home(request: Request):
     )
 
 
-def _normalize_cat_ids(ids: list[str]) -> list[str]:
+def _normalize_cat_ids(ids: list[str] | str) -> list[str]:
+    if isinstance(ids, str):
+        ids = [ids]
     return sorted({str(i).strip().zfill(3) for i in ids if str(i).strip()})
+
+
+def _coerce_form_ids(raw: list[str] | str | None) -> list[str]:
+    if raw is None:
+        return []
+    if isinstance(raw, str):
+        return _normalize_cat_ids([raw])
+    return _normalize_cat_ids(raw)
 
 
 def _load_owned_session(request: Request) -> list[str]:
@@ -230,7 +240,7 @@ async def gacha_post(
     action: str = Form("analyze"),
 ):
     pool_key = resolve_pool_key(pool) or DEFAULT_POOL_KEY
-    saved = _save_owned_session(request, selected_ids)
+    saved = _save_owned_session(request, _coerce_form_ids(selected_ids))
     saved_message = None
 
     if action == "save":
