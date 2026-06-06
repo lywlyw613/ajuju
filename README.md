@@ -6,7 +6,7 @@
 
 ```bash
 cd battlecats_analyzer
-pip install -r requirements.txt
+pip install -r requirements-ml.txt   # 本機含 ML；或 pip install -r requirements.txt（僅網站）
 python -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
