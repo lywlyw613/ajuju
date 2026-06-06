@@ -14,6 +14,9 @@
   --tag-bg: #e8eef8;
   --success: #2d8a5e;
   --img-bg: linear-gradient(135deg, #ffd86b 0%, #f5a623 100%);
+  --page-pad: 1.05rem;
+  --card-pad: 1rem;
+  --inset-pad: 0.75rem;
 }
 
 * {
@@ -90,7 +93,7 @@ body {
 
 main {
   flex: 1;
-  padding: 1rem;
+  padding: var(--page-pad);
   padding-bottom: 2rem;
   overflow-x: hidden;
   min-width: 0;
@@ -113,11 +116,22 @@ main {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 1rem;
+  padding: var(--card-pad);
   margin-bottom: 1rem;
   box-shadow: 0 4px 14px rgba(59, 50, 33, 0.08);
   overflow: hidden;
   max-width: 100%;
+}
+
+/* 角色名稱 — 全站加粗 */
+.char-name,
+.char-card .name,
+.gacha-card .name,
+.carousel-item .cap-name,
+.explanation-head,
+.detail-hero .hero-title {
+  font-weight: 800;
+  letter-spacing: 0.01em;
 }
 
 .card h2 {
@@ -205,7 +219,7 @@ main {
 }
 
 .carousel-item .cap {
-  padding: 0.6rem 0.7rem 0.7rem;
+  padding: 0.65rem 0.75rem 0.75rem;
   font-size: 0.78rem;
   font-weight: 600;
   line-height: 1.4;
@@ -479,7 +493,7 @@ main {
 }
 
 .gacha-card .info {
-  padding: 0.5rem 0.55rem 0.6rem;
+  padding: 0.55rem 0.65rem 0.65rem;
   text-align: left;
   min-width: 0;
   overflow: hidden;
@@ -665,18 +679,19 @@ main {
   margin-top: 0.25rem;
   overflow: hidden;
   max-width: 100%;
+  padding: 0.15rem 0.1rem 0.1rem;
 }
 
 .explanation-summary {
-  margin: 0.45rem 0 0.55rem;
-  padding: 0.45rem 0.55rem;
+  margin: 0.5rem 0 0.6rem;
+  padding: 0.6rem 0.75rem;
   background: rgba(255, 255, 255, 0.55);
   border-radius: 8px;
   font-size: 0.76rem;
 }
 
 .explanation-expand {
-  margin-top: 0.35rem;
+  margin-top: 0.45rem;
   border: 1px dashed var(--border);
   border-radius: 10px;
   overflow: hidden;
@@ -685,7 +700,7 @@ main {
 
 .explanation-expand summary {
   cursor: pointer;
-  padding: 0.55rem 0.65rem;
+  padding: 0.65rem 0.75rem;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--accent);
@@ -698,39 +713,43 @@ main {
 }
 
 .explanation-expand .explanation-list {
-  padding: 0 0.35rem 0.45rem;
+  padding: 0 0.55rem 0.55rem;
 }
 
 .explanation-list {
   list-style: none;
   margin: 0.5rem 0 0;
-  padding: 0;
+  padding: 0 0.05rem;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.5rem;
 }
 
 .explanation-list li {
   font-size: 0.76rem;
-  line-height: 1.45;
-  padding: 0.45rem 0.55rem;
+  line-height: 1.5;
+  padding: 0.6rem 0.75rem;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 8px;
   word-break: break-word;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .explanation-head {
   display: block;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text);
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.2rem;
+  line-height: 1.35;
+  padding-right: 0.15rem;
 }
 
 .explanation-points {
   display: block;
   color: var(--muted);
   font-size: 0.72rem;
+  line-height: 1.45;
+  padding-right: 0.1rem;
 }
 
 .pool-report-grid {
@@ -744,7 +763,7 @@ main {
 .pool-report-block {
   background: var(--card-alt);
   border-radius: 10px;
-  padding: 0.65rem;
+  padding: 0.75rem;
   min-width: 0;
   overflow: hidden;
 }
@@ -755,6 +774,7 @@ main {
   letter-spacing: 0.04em;
   color: var(--muted);
   font-weight: 700;
+  padding: 0 0.05rem;
 }
 
 .pool-report-value {
@@ -762,7 +782,8 @@ main {
   font-weight: 700;
   margin-top: 0.25rem;
   word-break: break-word;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  padding: 0 0.05rem;
 }
 
 .mock-tag {

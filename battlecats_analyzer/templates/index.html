@@ -10,7 +10,7 @@
         <img src="{{ s.image_url }}" alt="{{ s.name }}" loading="lazy" />
       </div>
       <div class="cap">
-        <div class="cap-name">{{ s.name }}</div>
+        <div class="cap-name char-name">{{ s.name }}</div>
         <div class="cap-meta">
           <span class="rarity rarity-{{ s.rarity }}">{{ s.rarity }}</span>
           {% if s.stars and s.stars != '—' %}<span class="star-row star-sm">{{ s.stars }}</span>{% endif %}

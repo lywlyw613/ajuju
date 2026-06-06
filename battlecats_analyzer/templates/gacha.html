@@ -80,7 +80,7 @@
     <ul class="explanation-list">
       {% for item in pool_report.explanation_visible %}
       <li>
-        <span class="explanation-head">{{ item.head }}</span>
+        <span class="explanation-head char-name">{{ item.head }}</span>
         {% if item.points %}
         <span class="explanation-points">{{ item.points|join(' · ') }}</span>
         {% endif %}
@@ -94,7 +94,7 @@
       <ul class="explanation-list">
         {% for item in pool_report.explanation_hidden %}
         <li>
-          <span class="explanation-head">{{ item.head }}</span>
+          <span class="explanation-head char-name">{{ item.head }}</span>
           {% if item.points %}
           <span class="explanation-points">{{ item.points|join(' · ') }}</span>
           {% endif %}
@@ -222,7 +222,7 @@
 
         <div class="info">
 
-          <div class="name" title="{{ c.all_names|join(' / ') }}">{{ c.name }}</div>
+          <div class="name char-name" title="{{ c.all_names|join(' / ') }}">{{ c.name }}</div>
 
           <div class="name-id">ID {{ c.id }}</div>
 
