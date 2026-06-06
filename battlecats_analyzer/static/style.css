@@ -964,6 +964,90 @@ main {
   border-radius: 8px;
 }
 
+/* --- 陣容評分（優先） vs 卡池分析（次要） --- */
+.section-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.section-head-row h2 {
+  margin: 0;
+}
+
+.priority-badge {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+}
+
+.section-sub-badge {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--muted);
+}
+
+.roster-primary {
+  border: 2px solid var(--accent);
+  box-shadow: 0 4px 18px rgba(180, 76, 57, 0.15);
+}
+
+.pool-report-secondary {
+  opacity: 0.96;
+  border-style: dashed;
+}
+
+.lineup-score-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.5rem 0 0.65rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 12px;
+  border: 1px solid rgba(180, 76, 57, 0.2);
+}
+
+.lineup-score-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.lineup-score-value {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1.2;
+  margin-top: 0.15rem;
+}
+
+.tier-badge.tier-lg {
+  font-size: 0.95rem;
+  padding: 0.35rem 0.65rem;
+}
+
+.lineup-module-grid .stat-grade {
+  font-size: 0.72em;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.stat-item-overall {
+  background: rgba(180, 76, 57, 0.08);
+}
+
 /* --- 外層舞台（手機／桌面共用） --- */
 .app-stage {
   width: 100%;

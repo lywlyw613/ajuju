@@ -119,13 +119,14 @@ def _gacha_context(
     selected_ids: list[str],
     pool_key: str,
     *,
-    analysis=None,
     pool_report=None,
     saved_message: str | None = None,
 ):
     selected = {str(i).zfill(3) for i in selected_ids}
+    selected_list = sorted(selected)
     characters = get_gacha_pool(query, pool_key=pool_key)
     display_pool = POOL_NAME if pool_key == DEFAULT_POOL_KEY else pool_key
+    lineup = analyze_roster(selected_list) if selected_list else None
     return {
         "title": APP_TITLE,
         "pool_name": display_pool,
@@ -135,7 +136,7 @@ def _gacha_context(
         "characters": characters,
         "selected_ids": selected,
         "owned_count": len(selected),
-        "analysis": analysis,
+        "lineup": lineup,
         "pool_report": pool_report or analyze_pool(characters, display_pool),
         "saved_message": saved_message,
     }
@@ -176,19 +177,17 @@ async def gacha_post(
 ):
     pool_key = resolve_pool_key(pool) or DEFAULT_POOL_KEY
     saved = _save_owned_session(request, selected_ids)
-    analysis = None
     saved_message = None
 
     if action == "save":
         saved_message = f"已儲存 {len(saved)} 隻持有角色（離開頁面後仍會保留勾選）"
     else:
-        analysis = analyze_roster(saved)
-        saved_message = f"已儲存 {len(saved)} 隻持有角色並完成組合分析"
+        saved_message = f"已儲存 {len(saved)} 隻持有角色並更新陣容評分"
 
     return templates.TemplateResponse(
         request,
         "gacha.html",
-        _gacha_context(q, saved, pool_key, analysis=analysis, saved_message=saved_message),
+        _gacha_context(q, saved, pool_key, saved_message=saved_message),
     )
 
 

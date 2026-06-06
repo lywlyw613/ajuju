@@ -25,7 +25,7 @@
 <details class="guide-hint">
   <summary>不會用？點這裡看快速提示</summary>
   <div class="guide-body">
-    ① 上方選卡池 → ② 看 Explanation 短評 → ③ 勾選已有角色 → ④ 按「分析組合」。完整教學請回<a href="/">首頁</a>。
+    ① 上方選卡池 → ② 勾選已有角色（陣容評分會自動更新）→ ③ 需要時再看下方整池分析。完整教學請回<a href="/">首頁</a>。
   </div>
 </details>
 
@@ -49,11 +49,69 @@
 
 
 
+{% if lineup and owned_count > 0 %}
+
+<section class="card roster-primary">
+
+  <div class="section-head-row">
+    <h2>陣容評分</h2>
+    <span class="priority-badge">優先參考</span>
+  </div>
+
+  <p class="hero-sub">依你勾選的 <strong>{{ owned_count }}</strong> 隻持有角色計算
+    {% if lineup.missing %}（{{ lineup.missing|length }} 隻尚無模組分資料）{% endif %}
+  </p>
+
+  {% if lineup.count > 0 %}
+  <div class="lineup-score-hero">
+    <div>
+      <div class="lineup-score-label">陣容綜合分</div>
+      <div class="lineup-score-value">{{ lineup.lineup_score_label }}</div>
+    </div>
+    <span class="tier-badge tier-lg">{{ lineup.tier }}</span>
+  </div>
+
+  <p class="roster-summary">{{ lineup.summary }}</p>
+
+  <ul class="mod-notes">
+    {% for note in lineup.mod_notes %}<li>{{ note }}</li>{% endfor %}
+  </ul>
+
+  {% if lineup.module_rows %}
+  <div class="stats-grid lineup-module-grid">
+    {% for row in lineup.module_rows %}
+    <div class="stat-item">
+      <div class="label">{{ row.label }}</div>
+      <div class="val">{{ row.avg or '—' }}<span class="stat-grade"> · {{ row.grade }}</span></div>
+    </div>
+    {% endfor %}
+    <div class="stat-item stat-item-overall">
+      <div class="label">陣容綜合平均</div>
+      <div class="val">{{ lineup.averages.overall or '—' }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% else %}
+  <p class="empty" style="padding:1rem 0">勾選的角色尚無模組分資料，無法計算陣容評分。</p>
+  {% endif %}
+
+</section>
+
+{% endif %}
+
+
+
 {% if pool_report %}
 
-<section class="card pool-report">
+<section class="card pool-report pool-report-secondary">
 
-  <h2>卡池分析</h2>
+  <div class="section-head-row">
+    <h2>卡池分析</h2>
+    <span class="section-sub-badge">整池參考</span>
+  </div>
+
+  <p class="hero-sub" style="margin-bottom:0.75rem">以下為整個卡池的概略評價；若已勾選持有角色，請<strong>優先看上方陣容評分</strong>。</p>
 
   <div class="pool-report-grid">
 
@@ -123,7 +181,7 @@
 
 {% endif %}
 
-<p class="hero-sub" style="margin-top:0.35rem;font-size:0.75rem">勾選後請按「儲存持有」或「分析組合」（皆會寫入 Session，換頁不會消失）</p>
+<p class="hero-sub" style="margin-top:0.35rem;font-size:0.75rem">勾選後按「儲存持有」或「更新陣容評分」（皆會寫入 Session，換頁不會消失）</p>
 
 
 
@@ -136,48 +194,6 @@
   <button type="submit" class="btn btn-primary" style="padding:0.7rem 1rem;border-radius:10px;">篩選</button>
 
 </form>
-
-
-
-{% if analysis %}
-
-<section class="card roster-result">
-
-  <h2>持有組合分析</h2>
-
-  <p class="hero-sub">已選 <strong>{{ analysis.count }}</strong> 隻
-
-    {% if analysis.missing %}（{{ analysis.missing|length }} 隻無 CSV 模組分）{% endif %}
-
-    · 綜合評級：<span class="tier-badge">{{ analysis.tier }}</span></p>
-
-  <p class="roster-summary">{{ analysis.summary }}</p>
-
-  <ul class="mod-notes">
-
-    {% for note in analysis.mod_notes %}<li>{{ note }}</li>{% endfor %}
-
-  </ul>
-
-  {% if analysis.averages.overall is not none %}
-
-  <div class="stats-grid" style="margin-top:0.75rem">
-
-    <div class="stat-item"><div class="label">模組1 平均</div><div class="val">{{ analysis.averages.mod1 or '—' }}</div></div>
-
-    <div class="stat-item"><div class="label">模組2 平均</div><div class="val">{{ analysis.averages.mod2 or '—' }}</div></div>
-
-    <div class="stat-item"><div class="label">模組3 平均</div><div class="val">{{ analysis.averages.mod3 or '—' }}</div></div>
-
-    <div class="stat-item"><div class="label">綜合平均</div><div class="val">{{ analysis.averages.overall }}</div></div>
-
-  </div>
-
-  {% endif %}
-
-</section>
-
-{% endif %}
 
 
 
@@ -197,7 +213,7 @@
 
     <button type="submit" name="action" value="save" class="btn btn-ghost">儲存持有</button>
 
-    <button type="submit" name="action" value="analyze" class="btn btn-primary">分析組合</button>
+    <button type="submit" name="action" value="analyze" class="btn btn-primary">更新陣容評分</button>
 
   </div>
 
@@ -275,7 +291,7 @@
 
     <button type="submit" name="action" value="save" class="btn btn-ghost" style="margin-bottom:0.5rem">儲存持有</button>
 
-    <button type="submit" name="action" value="analyze" class="btn btn-primary">分析組合</button>
+    <button type="submit" name="action" value="analyze" class="btn btn-primary">更新陣容評分</button>
 
   </div>
 

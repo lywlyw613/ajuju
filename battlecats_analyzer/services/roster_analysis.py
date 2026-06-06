@@ -1,4 +1,4 @@
-"""Team roster strength from module_scores_export.csv."""
+"""Team roster / lineup scoring from module_scores_export.csv."""
 
 from __future__ import annotations
 
@@ -7,8 +7,13 @@ from pathlib import Path
 
 from config import MODULE_SCORES_CSV
 
-_GRADE_ORDER = {"S": 4, "A": 3, "B": 2, "C": 1}
 _GRADE_FROM_SCORE = [(9.0, "S"), (7.5, "A"), (5.5, "B"), (0.0, "C")]
+
+MODULE_LABELS = {
+    "mod1": "面板白質評分",
+    "mod2": "屬性特化評分",
+    "mod3": "屬性控場評分",
+}
 
 _scores_cache: dict[str, dict] | None = None
 
@@ -93,11 +98,16 @@ def analyze_roster(selected_ids: list[str]) -> dict:
     if not members:
         return {
             "count": 0,
+            "selected_count": len(selected),
             "missing": missing,
             "members": [],
-            "summary": "請至少勾選一隻在分析表內有資料的角色。",
+            "summary": "請至少勾選一隻在模組分資料表內有紀錄的角色。",
             "averages": {},
             "grade_counts": {},
+            "tier": "—",
+            "lineup_score_label": "—",
+            "module_rows": [],
+            "mod_notes": [],
         }
 
     def _avg(key: str) -> float | None:
@@ -121,27 +131,32 @@ def analyze_roster(selected_ids: list[str]) -> dict:
     overall = avgs["overall"] or 0
     if overall >= 8:
         tier = "頂尖"
-        summary = "整體組合強度極高，三模組平均表現優秀，適合多數高難關。"
+        summary = "整體陣容極強，三項模組平均表現優秀，適合多數高難關。"
     elif overall >= 7:
         tier = "強勢"
-        summary = "組合強度良好，核心模組均衡，建議補齊控場或屬性特攻短板。"
+        summary = "陣容強度良好，建議補齊屬性控場或特化短板。"
     elif overall >= 5.5:
         tier = "中等"
-        summary = "組合可用但仍有明顯缺口，建議優先抽取高模組分的 SSR/SSSR。"
+        summary = "陣容可用但仍有缺口，可優先補強評分較低的模組。"
     else:
         tier = "待加強"
-        summary = "目前持有角平均模組分偏低，建議鎖定卡池高分角逐步替換。"
+        summary = "目前陣容平均模組分偏低，建議逐步替換為高分角色。"
 
+    module_rows = []
     mod_notes = []
-    if avgs["mod1"] is not None:
-        mod_notes.append(f"模組1（面板/輸出）平均 {avgs['mod1']:.2f}，等第約 {_grade_from_number(avgs['mod1'])}")
-    if avgs["mod2"] is not None:
-        mod_notes.append(f"模組2（屬性特攻）平均 {avgs['mod2']:.2f}，等第約 {_grade_from_number(avgs['mod2'])}")
-    if avgs["mod3"] is not None:
-        mod_notes.append(f"模組3（控場）平均 {avgs['mod3']:.2f}，等第約 {_grade_from_number(avgs['mod3'])}")
+    for key in ("mod1", "mod2", "mod3"):
+        avg = avgs[key]
+        label = MODULE_LABELS[key]
+        grade = _grade_from_number(avg)
+        module_rows.append({"key": key, "label": label, "avg": avg, "grade": grade})
+        if avg is not None:
+            mod_notes.append(f"{label} 平均 {avg:.2f}，等第約 {grade}")
+
+    lineup_score_label = f"{overall:.2f} / 10" if avgs["overall"] is not None else "—"
 
     return {
         "count": len(members),
+        "selected_count": len(selected),
         "missing": missing,
         "members": sorted(members, key=lambda x: -(x.get("overall") or 0)),
         "averages": avgs,
@@ -149,4 +164,6 @@ def analyze_roster(selected_ids: list[str]) -> dict:
         "tier": tier,
         "summary": summary,
         "mod_notes": mod_notes,
+        "module_rows": module_rows,
+        "lineup_score_label": lineup_score_label,
     }
