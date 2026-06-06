@@ -12,6 +12,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from config import (
     APP_TITLE,
+    DEFAULT_POOL_KEY,
     POOL_NAME,
     SESSION_COOKIE_NAME,
     SESSION_KEY_OWNED,
@@ -25,6 +26,8 @@ from services.catalog import (
     get_gacha_pool,
     search_characters,
 )
+from services.gacha_pools import list_pool_names, pools_with_ssr, resolve_pool_key
+from services.pool_analysis import analyze_pool
 from services.roster_analysis import analyze_roster
 
 APP_DIR = Path(__file__).resolve().parent
@@ -114,19 +117,26 @@ def _save_owned_session(request: Request, ids: list[str]) -> list[str]:
 def _gacha_context(
     query: str,
     selected_ids: list[str],
+    pool_key: str,
     *,
     analysis=None,
+    pool_report=None,
     saved_message: str | None = None,
 ):
     selected = {str(i).zfill(3) for i in selected_ids}
+    characters = get_gacha_pool(query, pool_key=pool_key)
+    display_pool = POOL_NAME if pool_key == DEFAULT_POOL_KEY else pool_key
     return {
         "title": APP_TITLE,
-        "pool_name": POOL_NAME,
+        "pool_name": display_pool,
+        "pool_key": pool_key,
+        "pool_options": pools_with_ssr() or list_pool_names(),
         "query": query,
-        "characters": get_gacha_pool(query),
+        "characters": characters,
         "selected_ids": selected,
         "owned_count": len(selected),
         "analysis": analysis,
+        "pool_report": pool_report or analyze_pool(characters, display_pool),
         "saved_message": saved_message,
     }
 
@@ -135,14 +145,16 @@ def _gacha_context(
 async def gacha_page(
     request: Request,
     q: str = Query("", alias="q"),
+    pool: str = Query("", alias="pool"),
     select_all: bool = Query(False),
     clear_owned: bool = Query(False),
 ):
+    pool_key = resolve_pool_key(pool) or DEFAULT_POOL_KEY
     if clear_owned:
         request.session.pop(SESSION_KEY_OWNED, None)
         selected: list[str] = []
     elif select_all:
-        chars = get_gacha_pool(q)
+        chars = get_gacha_pool(q, pool_key=pool_key)
         selected = _save_owned_session(request, [c["id"] for c in chars])
     else:
         selected = _load_owned_session(request)
@@ -150,7 +162,7 @@ async def gacha_page(
     return templates.TemplateResponse(
         request,
         "gacha.html",
-        _gacha_context(q, selected),
+        _gacha_context(q, selected, pool_key),
     )
 
 
@@ -158,9 +170,11 @@ async def gacha_page(
 async def gacha_post(
     request: Request,
     q: str = Form(""),
+    pool: str = Form(""),
     selected_ids: list[str] = Form([]),
     action: str = Form("analyze"),
 ):
+    pool_key = resolve_pool_key(pool) or DEFAULT_POOL_KEY
     saved = _save_owned_session(request, selected_ids)
     analysis = None
     saved_message = None
@@ -174,7 +188,7 @@ async def gacha_post(
     return templates.TemplateResponse(
         request,
         "gacha.html",
-        _gacha_context(q, saved, analysis=analysis, saved_message=saved_message),
+        _gacha_context(q, saved, pool_key, analysis=analysis, saved_message=saved_message),
     )
 
 

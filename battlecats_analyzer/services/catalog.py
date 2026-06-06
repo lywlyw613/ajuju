@@ -1,4 +1,4 @@
-"""Load characters, gacha pool, ML scores — all from ajuju_mission data."""
+"""Load characters, gacha pool, tier scores — all from ajuju_mission data."""
 
 from __future__ import annotations
 
@@ -9,8 +9,10 @@ import sys
 from pathlib import Path
 
 from config import DATA_JSON, GACHA_JSON, ML_DIR, SKIP_ML_BUILD, unit_image_url
-from services.analysis import build_ai_analysis
+from services.gacha_pools import get_pool_ids, resolve_pool_key
+from services.review_sections import get_review
 from services.roster_analysis import get_module_score
+from services.tier_list import get_tier, load_tier_list
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 if str(ML_DIR) not in sys.path:
@@ -30,13 +32,27 @@ def _load_json(path: Path) -> dict:
         return json.load(f)
 
 
-def _rating_to_display(rating) -> float | None:
-    if rating in (None, "", "NAN", "nan"):
-        return None
-    try:
-        return round(max(0.0, min(4.5, float(rating))) / 4.5 * 10.0, 1)
-    except (TypeError, ValueError):
-        return None
+def _apply_tier(summary: dict, pool_rarity: str | None = None) -> dict:
+    """Merge tier list CSV fields into character summary."""
+    tier = get_tier(summary["id"])
+    if tier:
+        summary["tier"] = tier
+        summary["name"] = summary.get("name") or tier.get("name") or summary["id"]
+        summary["rarity"] = pool_rarity or tier.get("rarity") or summary.get("rarity", "N")
+        summary["score"] = tier.get("composite_score")
+        summary["score_display"] = (
+            f"{tier['composite_score']:.2f} / 5" if tier.get("composite_score") is not None else "—"
+        )
+        summary["grade"] = tier.get("composite_grade") or "—"
+        summary["stars"] = tier.get("stars", "—")
+        summary["stars_count"] = tier.get("stars_count", 0)
+    else:
+        summary.setdefault("tier", None)
+        summary.setdefault("score_display", "—")
+        summary.setdefault("grade", "—")
+        summary.setdefault("stars", "—")
+        summary.setdefault("stars_count", 0)
+    return summary
 
 
 def _ability_tags(form: dict) -> list[str]:
@@ -101,33 +117,11 @@ def _char_summary(cat_id: str, char: dict, pool_rarity: str | None = None) -> di
     cid = cat_id.zfill(3)
     names = _collect_name_info(char, form)
     name = names["name"] or cid
-    rating = char.get("評分")
-    display_score = _rating_to_display(rating)
-    csv_row = get_module_score(cid)
-    if csv_row and csv_row.get("display_score") is not None:
-        display_score = csv_row["display_score"]
-    row = (_scores_by_id or {}).get(cid, {})
-    if display_score is None and row:
-        for key in ("score_mod1", "pred_m1_評分"):
-            if key in row and row[key] is not None:
-                try:
-                    v = float(row[key])
-                    display_score = round(v if v <= 10 else v / 4.5 * 10, 1)
-                    break
-                except (TypeError, ValueError):
-                    pass
-    if display_score is None:
-        display_score = round(
-            (
-                float(row.get("score_mod1", 5) or 5)
-                + float(row.get("score_mod2", 5) or 5)
-                + float(row.get("score_mod3", 5) or 5)
-            )
-            / 3,
-            1,
-        )
 
-    return {
+    csv_row = get_module_score(cid)
+    row = (_scores_by_id or {}).get(cid, {})
+
+    summary = {
         "id": cid,
         "name": name,
         "name_jp": names["name_jp"],
@@ -136,14 +130,18 @@ def _char_summary(cat_id: str, char: dict, pool_rarity: str | None = None) -> di
         "all_names": names["all_names"],
         "search_text": names["search_text"],
         "rarity": pool_rarity or _infer_rarity(cat_id),
-        "score": display_score,
+        "score": None,
         "module_csv": csv_row,
         "image_url": unit_image_url(cat_id),
         "form_stage": stage,
     }
+    return _apply_tier(summary, pool_rarity)
 
 
 def _infer_rarity(cat_id: str) -> str:
+    tier = get_tier(cat_id)
+    if tier and tier.get("rarity"):
+        return tier["rarity"]
     g = _gacha or {}
     return g.get(cat_id.zfill(3), g.get(cat_id.lstrip("0") or "0", "N"))
 
@@ -171,6 +169,7 @@ def get_catalog() -> dict[str, dict]:
     raw = _load_json(DATA_JSON)
     _gacha = _load_json(GACHA_JSON)
     _scores_by_id = _build_scores(raw)
+    load_tier_list()
 
     _catalog = {}
     for cat_id, char in raw.items():
@@ -182,9 +181,39 @@ def get_catalog() -> dict[str, dict]:
     return _catalog
 
 
-def get_gacha_pool(query: str = "") -> list[dict]:
-    gacha = _gacha or _load_json(GACHA_JSON)
+def get_gacha_pool(query: str = "", pool_key: str | None = None) -> list[dict]:
     catalog = get_catalog()
+    resolved = resolve_pool_key(pool_key)
+    if not resolved:
+        return _legacy_gacha_pool(query, catalog)
+
+    pool: list[dict] = []
+    q = (query or "").strip().lower()
+    for cid, rarity in get_pool_ids(resolved):
+        entry = catalog.get(cid)
+        if not entry:
+            continue
+        s = dict(entry["summary"])
+        s["rarity"] = rarity
+        s = _apply_tier(s, rarity)
+        if q:
+            hay = f"{s['id']} {s.get('search_text', '')} {s.get('name', '')}".lower()
+            if q not in hay and q not in s["id"].lstrip("0"):
+                continue
+        pool.append(s)
+
+    pool.sort(
+        key=lambda x: (
+            0 if x["rarity"] == "SSSR" else 1,
+            -((x.get("tier") or {}).get("composite_score") or 0),
+        )
+    )
+    return pool
+
+
+def _legacy_gacha_pool(query: str, catalog: dict) -> list[dict]:
+    """Fallback when gacha_pool_characters_mapping.json is missing."""
+    gacha = _gacha or _load_json(GACHA_JSON)
     pool = []
     q = (query or "").strip().lower()
     for cat_id, rarity in gacha.items():
@@ -196,23 +225,29 @@ def get_gacha_pool(query: str = "") -> list[dict]:
             continue
         s = dict(entry["summary"])
         s["rarity"] = rarity
+        s = _apply_tier(s, rarity)
         if q:
             hay = f"{s['id']} {s.get('search_text', '')} {s.get('name', '')}".lower()
             if q not in hay and q not in s["id"].lstrip("0"):
                 continue
         pool.append(s)
-    pool.sort(key=lambda x: (0 if x["rarity"] == "SSSR" else 1, -(x.get("score") or 0)))
+    pool.sort(
+        key=lambda x: (
+            0 if x["rarity"] == "SSSR" else 1,
+            -((x.get("tier") or {}).get("composite_score") or 0),
+        )
+    )
     return pool
 
 
-def get_carousel_slides(n: int = 5) -> list[dict]:
-    pool = get_gacha_pool()
+def get_carousel_slides(n: int = 5, pool_key: str | None = None) -> list[dict]:
+    pool = get_gacha_pool(pool_key=pool_key)
     return pool[:n] if pool else []
 
 
 def search_characters(query: str = "") -> list[dict]:
     catalog = get_catalog()
-    items = [c["summary"] for c in catalog.values()]
+    items = [dict(c["summary"]) for c in catalog.values()]
     q = (query or "").strip().lower()
     if not q:
         return sorted(items, key=lambda x: x["name"])[:80]
@@ -256,10 +291,8 @@ def get_character_detail(cat_id: str) -> dict | None:
 
     row = (_scores_by_id or {}).get(cid, {})
     summary = dict(entry["summary"])
-    summary["rarity"] = _gacha.get(cid, summary.get("rarity", "N")) if _gacha else summary.get("rarity")
-
-    ai = build_ai_analysis(char, form, row)
-    abilities_text = list_active_abilities(form.get("能力", {}))
+    summary = _apply_tier(summary)
+    review = get_review(cid)
 
     return {
         **summary,
@@ -276,8 +309,8 @@ def get_character_detail(cat_id: str) -> dict | None:
             "再生產": _safe_num(form.get("再生產")),
         },
         "ability_tags": _ability_tags(form),
-        "abilities_text": abilities_text,
+        "abilities_text": list_active_abilities(form.get("能力", {})),
         "module_scores": _module_scores_for_detail(cid, row),
-        "ai": ai,
         "trait": row.get("針對屬性", "無"),
+        "review": review,
     }

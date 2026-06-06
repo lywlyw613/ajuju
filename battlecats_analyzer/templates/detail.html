@@ -1,64 +1,82 @@
-{% extends "base.html" %}
-{% block breadcrumb %}
-<div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; <a href="/search">搜尋結果</a> &gt;&gt; {{ c.name }}</div>
-{% endblock %}
-{% block content %}
-<div class="detail-hero">
-  <div class="img-wrap"><img src="{{ c.image_url }}" alt="{{ c.name }}" /></div>
-  <h2 class="hero-title">{{ c.name }}</h2>
-  {% if c.name_base and c.name_base != c.name %}
-  <p class="hero-sub">一階名稱：{{ c.name_base }}</p>
-  {% endif %}
-  <p class="hero-sub">ID {{ c.id }} · <span class="rarity rarity-{{ c.rarity }}">{{ c.rarity }}</span> · {{ c.form_stage }} · 評分 {{ c.score }}/10</p>
-</div>
-
-<div class="module-bars">
-  <div class="module-bar">模組1<div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod1 * 10)|int }}%"></div></div>{{ c.module_scores.mod1 }}</div>
-  <div class="module-bar">模組2<div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod2 * 10)|int }}%"></div></div>{{ c.module_scores.mod2 }}</div>
-  <div class="module-bar">模組3<div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod3 * 10)|int }}%"></div></div>{{ c.module_scores.mod3 }}</div>
-</div>
-
-<section class="card">
-  <h2>角色數值</h2>
-  <div class="stats-grid">
-    {% for label, val in c.stats.items() %}
-    <div class="stat-item">
-      <div class="label">{{ label }}</div>
-      <div class="val">{{ val }}</div>
-    </div>
-    {% endfor %}
-  </div>
-</section>
-
-<section class="card">
-  <h2>能力</h2>
-  <div class="tags">
-    {% for tag in c.ability_tags %}
-    <span class="tag">{{ tag }}</span>
-    {% else %}
-    <span class="tag">（無特殊能力）</span>
-    {% endfor %}
-  </div>
-  {% if c.trait and c.trait != '無' %}
-  <p class="hero-sub" style="margin-top:0.5rem;">針對屬性：{{ c.trait }}</p>
-  {% endif %}
-</section>
-
-<section class="card ai-block">
-  <h2>AI 分析</h2>
-  <h3>推薦抽取原因</h3>
-  <ul>
-    {% for r in c.ai.reasons %}<li>{{ r }}</li>{% endfor %}
-  </ul>
-  <h3>優點</h3>
-  <ul>
-    {% for p in c.ai.pros %}<li>{{ p }}</li>{% endfor %}
-  </ul>
-  <h3>缺點</h3>
-  <ul>
-    {% for n in c.ai.cons %}<li>{{ n }}</li>{% endfor %}
-  </ul>
-</section>
-
-<a class="btn btn-ghost" href="/gacha" style="margin-top:0.5rem;">返回卡池</a>
-{% endblock %}
+{% extends "base.html" %}
+{% block breadcrumb %}
+<div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; <a href="/search">搜尋結果</a> &gt;&gt; {{ c.name }}</div>
+{% endblock %}
+{% block content %}
+<div class="detail-hero">
+  <div class="img-wrap"><img src="{{ c.image_url }}" alt="{{ c.name }}" /></div>
+  <h2 class="hero-title">{{ c.name }}</h2>
+  {% if c.name_base and c.name_base != c.name %}
+  <p class="hero-sub">一階名稱：{{ c.name_base }}</p>
+  {% endif %}
+  <p class="hero-sub">
+    ID {{ c.id }} ·
+    <span class="rarity rarity-{{ c.rarity }}">{{ c.rarity }}</span> ·
+    {{ c.form_stage }}
+  </p>
+  {% if c.grade and c.grade != '—' %}
+  <div class="detail-tier">
+    <span class="grade-badge grade-{{ c.grade }} grade-lg">{{ c.grade }}</span>
+    {% if c.stars and c.stars != '—' %}
+    <span class="star-row star-lg">{{ c.stars }}</span>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% if c.score_display and c.score_display != '—' %}
+  <p class="composite-score">綜合評分：<strong>{{ c.score_display }}</strong></p>
+  <p class="hero-sub">等第：<strong>{{ c.grade }}</strong></p>
+  {% endif %}
+</div>
+
+<div class="module-bars">
+  <div class="module-bar">模組1<div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod1 * 10)|int }}%"></div></div>{{ c.module_scores.mod1 }}</div>
+  <div class="module-bar">模組2<div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod2 * 10)|int }}%"></div></div>{{ c.module_scores.mod2 }}</div>
+  <div class="module-bar">模組3<div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod3 * 10)|int }}%"></div></div>{{ c.module_scores.mod3 }}</div>
+</div>
+
+<section class="card">
+  <h2>角色數值</h2>
+  <div class="stats-grid">
+    {% for label, val in c.stats.items() %}
+    <div class="stat-item">
+      <div class="label">{{ label }}</div>
+      <div class="val">{{ val }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="card">
+  <h2>能力</h2>
+  <div class="tags">
+    {% for tag in c.ability_tags %}
+    <span class="tag">{{ tag }}</span>
+    {% else %}
+    <span class="tag">（無特殊能力）</span>
+    {% endfor %}
+  </div>
+  {% if c.trait and c.trait != '無' %}
+  <p class="hero-sub" style="margin-top:0.5rem;">針對屬性：{{ c.trait }}</p>
+  {% endif %}
+</section>
+
+{% if c.review %}
+<section class="card review-sections">
+  <h2>角色分析</h2>
+  <details class="accordion" open>
+    <summary>泛用性評估</summary>
+    <div class="accordion-body">{{ c.review.versatility }}</div>
+  </details>
+  <details class="accordion">
+    <summary>功能定位與戰術價值</summary>
+    <div class="accordion-body">{{ c.review.tactics }}</div>
+  </details>
+  <details class="accordion">
+    <summary>培養建議</summary>
+    <div class="accordion-body">{{ c.review.training }}</div>
+  </details>
+</section>
+{% endif %}
+
+<a class="btn btn-ghost" href="/gacha" style="margin-top:0.5rem;">返回卡池</a>
+{% endblock %}

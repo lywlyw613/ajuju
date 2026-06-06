@@ -1,121 +1,248 @@
 {% extends "base.html" %}
+
 {% block breadcrumb %}
+
 <div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; 卡池分析</div>
+
 {% endblock %}
+
 {% block content %}
+
 <h2 class="hero-title">{{ pool_name }}</h2>
+
 <p class="hero-sub">SSR / SSSR · 顯示 {{ characters|length }} 隻 · 已儲存持有 {{ owned_count }} 隻</p>
-{% if saved_message %}
-<p class="session-flash">{{ saved_message }}</p>
-{% endif %}
-<p class="hero-sub" style="margin-top:0.35rem;font-size:0.75rem">勾選後請按「儲存持有」或「分析組合」（皆會寫入 Session，換頁不會消失）</p>
 
-<form class="search-form" method="get" action="/gacha">
-  <input type="search" name="q" value="{{ query }}" placeholder="以名字或 ID 搜尋（例：武蔵、449）" />
-  <button type="submit" class="btn btn-primary" style="padding:0.7rem 1rem;border-radius:10px;">篩選</button>
-</form>
 
-{% if analysis %}
-<section class="card roster-result">
-  <h2>組合強度分析</h2>
-  <p class="hero-sub">已選 <strong>{{ analysis.count }}</strong> 隻
-    {% if analysis.missing %}（{{ analysis.missing|length }} 隻無 CSV 模組分）{% endif %}
-    · 綜合評級：<span class="tier-badge">{{ analysis.tier }}</span></p>
-  <p class="roster-summary">{{ analysis.summary }}</p>
-  <ul class="mod-notes">
-    {% for note in analysis.mod_notes %}<li>{{ note }}</li>{% endfor %}
-  </ul>
-  {% if analysis.averages.overall is not none %}
-  <div class="stats-grid" style="margin-top:0.75rem">
-    <div class="stat-item"><div class="label">模組1 平均</div><div class="val">{{ analysis.averages.mod1 or '—' }}</div></div>
-    <div class="stat-item"><div class="label">模組2 平均</div><div class="val">{{ analysis.averages.mod2 or '—' }}</div></div>
-    <div class="stat-item"><div class="label">模組3 平均</div><div class="val">{{ analysis.averages.mod3 or '—' }}</div></div>
-    <div class="stat-item"><div class="label">綜合平均</div><div class="val">{{ analysis.averages.overall }}</div></div>
-  </div>
-  {% endif %}
-  {% if analysis.grade_counts %}
-  <p class="hero-sub" style="margin-top:0.5rem">
-    等第統計 —
-    S: {{ analysis.grade_counts.S }}
-    A: {{ analysis.grade_counts.A }}
-    B: {{ analysis.grade_counts.B }}
-    C: {{ analysis.grade_counts.C }}
-  </p>
-  {% endif %}
-  {% if analysis.members %}
-  <details style="margin-top:0.75rem">
-    <summary style="cursor:pointer;font-weight:600">查看各角色模組分（對應 module_scores_export.csv）</summary>
-    <table class="roster-table">
-      <thead>
-        <tr><th>ID</th><th>模組1</th><th>模組2</th><th>模組3</th><th>綜合</th></tr>
-      </thead>
-      <tbody>
-        {% for m in analysis.members %}
-        <tr>
-          <td>{{ m.id }}</td>
-          <td>{{ m.mod1 or '—' }} ({{ m.grade1 }})</td>
-          <td>{{ m.mod2 or '—' }} ({{ m.grade2 }})</td>
-          <td>{{ m.mod3 or '—' }} ({{ m.grade3 }})</td>
-          <td>{{ m.overall or '—' }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </details>
-  {% endif %}
-</section>
-{% endif %}
 
-<form method="post" action="/gacha" id="roster-form">
+<form class="pool-select-form" method="get" action="/gacha">
+
+  <label for="pool">選擇卡池</label>
+
+  <select name="pool" id="pool" onchange="this.form.submit()">
+
+    {% for p in pool_options %}
+
+    <option value="{{ p }}" {% if p == pool_key %}selected{% endif %}>{{ p }}</option>
+
+    {% endfor %}
+
+  </select>
+
   <input type="hidden" name="q" value="{{ query }}" />
 
-  <div class="gacha-toolbar">
-    <a class="btn btn-ghost" href="/gacha?q={{ query }}&select_all=1">全選目前列表</a>
-    <a class="btn btn-ghost" href="/gacha?q={{ query }}&clear_owned=1">清除勾選</a>
-    <button type="submit" name="action" value="save" class="btn btn-ghost">儲存持有</button>
-    <button type="submit" name="action" value="analyze" class="btn btn-primary">分析組合</button>
+</form>
+
+
+
+{% if pool_report %}
+
+<section class="card pool-report">
+
+  <h2>卡池分析</h2>
+
+  <div class="pool-report-grid">
+
+    <div class="pool-report-block">
+
+      <div class="pool-report-label">Pool Score</div>
+
+      <div class="pool-report-value">{{ pool_report.pool_score_label }}</div>
+
+      {% if pool_report.is_mock_score %}
+
+      <div class="mock-tag">模擬分數 · 待後端模型串接</div>
+
+      {% endif %}
+
+    </div>
+
+    <div class="pool-report-block">
+
+      <div class="pool-report-label">Recommendation</div>
+
+      <div class="pool-report-value rec">{{ pool_report.recommendation }}</div>
+
+    </div>
+
   </div>
+
+  <div class="pool-report-block explanation-block">
+
+    <div class="pool-report-label">Explanation</div>
+
+    <pre class="explanation-text">{{ pool_report.explanation }}</pre>
+
+  </div>
+
+</section>
+
+{% endif %}
+
+
+
+{% if saved_message %}
+
+<p class="session-flash">{{ saved_message }}</p>
+
+{% endif %}
+
+<p class="hero-sub" style="margin-top:0.35rem;font-size:0.75rem">勾選後請按「儲存持有」或「分析組合」（皆會寫入 Session，換頁不會消失）</p>
+
+
+
+<form class="search-form" method="get" action="/gacha">
+
+  <input type="hidden" name="pool" value="{{ pool_key }}" />
+
+  <input type="search" name="q" value="{{ query }}" placeholder="以名字或 ID 搜尋（例：武蔵、449）" />
+
+  <button type="submit" class="btn btn-primary" style="padding:0.7rem 1rem;border-radius:10px;">篩選</button>
+
+</form>
+
+
+
+{% if analysis %}
+
+<section class="card roster-result">
+
+  <h2>持有組合分析</h2>
+
+  <p class="hero-sub">已選 <strong>{{ analysis.count }}</strong> 隻
+
+    {% if analysis.missing %}（{{ analysis.missing|length }} 隻無 CSV 模組分）{% endif %}
+
+    · 綜合評級：<span class="tier-badge">{{ analysis.tier }}</span></p>
+
+  <p class="roster-summary">{{ analysis.summary }}</p>
+
+  <ul class="mod-notes">
+
+    {% for note in analysis.mod_notes %}<li>{{ note }}</li>{% endfor %}
+
+  </ul>
+
+  {% if analysis.averages.overall is not none %}
+
+  <div class="stats-grid" style="margin-top:0.75rem">
+
+    <div class="stat-item"><div class="label">模組1 平均</div><div class="val">{{ analysis.averages.mod1 or '—' }}</div></div>
+
+    <div class="stat-item"><div class="label">模組2 平均</div><div class="val">{{ analysis.averages.mod2 or '—' }}</div></div>
+
+    <div class="stat-item"><div class="label">模組3 平均</div><div class="val">{{ analysis.averages.mod3 or '—' }}</div></div>
+
+    <div class="stat-item"><div class="label">綜合平均</div><div class="val">{{ analysis.averages.overall }}</div></div>
+
+  </div>
+
+  {% endif %}
+
+</section>
+
+{% endif %}
+
+
+
+<form method="post" action="/gacha" id="roster-form">
+
+  <input type="hidden" name="q" value="{{ query }}" />
+
+  <input type="hidden" name="pool" value="{{ pool_key }}" />
+
+
+
+  <div class="gacha-toolbar">
+
+    <a class="btn btn-ghost" href="/gacha?pool={{ pool_key|urlencode }}&q={{ query|urlencode }}&select_all=1">全選目前列表</a>
+
+    <a class="btn btn-ghost" href="/gacha?pool={{ pool_key|urlencode }}&q={{ query|urlencode }}&clear_owned=1">清除勾選</a>
+
+    <button type="submit" name="action" value="save" class="btn btn-ghost">儲存持有</button>
+
+    <button type="submit" name="action" value="analyze" class="btn btn-primary">分析組合</button>
+
+  </div>
+
+
 
   <div class="gacha-grid">
+
     {% for c in characters %}
+
     <div class="gacha-card {% if c.id in selected_ids %}is-owned{% endif %}">
+
       <label class="own-check">
+
         <input type="checkbox" name="selected_ids" value="{{ c.id }}" {% if c.id in selected_ids %}checked{% endif %} />
+
         <span>持有</span>
+
       </label>
+
       <a class="gacha-card-link" href="/character/{{ c.id }}">
+
         <div class="thumb gacha-thumb">
+
           <img src="{{ c.image_url }}" alt="{{ c.name }}" loading="lazy" />
+
         </div>
+
         <div class="info">
+
           <div class="name" title="{{ c.all_names|join(' / ') }}">{{ c.name }}</div>
-          {% if c.name_base and c.name_base != c.name %}
-          <div class="name-sub">一階：{{ c.name_base }}</div>
-          {% endif %}
-          {% if c.name_other %}
-          <div class="name-sub">其他階：{{ c.name_other|join('、') }}</div>
-          {% endif %}
+
           <div class="name-id">ID {{ c.id }}</div>
+
           <div class="meta">
+
             <span class="rarity rarity-{{ c.rarity }}">{{ c.rarity }}</span>
-            <span class="score-pill">{{ c.score }}/10</span>
+
+            {% if c.grade and c.grade != '—' %}
+
+            <span class="grade-badge grade-{{ c.grade }}">{{ c.grade }}</span>
+
+            {% endif %}
+
           </div>
-          {% if c.module_csv %}
-          <div class="csv-scores">
-            M1 {{ c.module_csv.mod1 or '—' }} · M2 {{ c.module_csv.mod2 or '—' }} · M3 {{ c.module_csv.mod3 or '—' }}
-          </div>
+
+          {% if c.stars and c.stars != '—' %}
+
+          <div class="star-row" aria-label="綜合評分星等">{{ c.stars }}</div>
+
           {% endif %}
+
+          {% if c.score_display and c.score_display != '—' %}
+
+          <div class="score-pill">{{ c.score_display }}</div>
+
+          {% endif %}
+
         </div>
+
       </a>
+
     </div>
+
     {% else %}
+
     <p class="empty">找不到符合條件的角色</p>
+
     {% endfor %}
+
   </div>
 
+
+
   <div class="gacha-bottom-bar">
+
     <button type="submit" name="action" value="save" class="btn btn-ghost" style="margin-bottom:0.5rem">儲存持有</button>
+
     <button type="submit" name="action" value="analyze" class="btn btn-primary">分析組合</button>
+
   </div>
+
 </form>
+
 {% endblock %}
+

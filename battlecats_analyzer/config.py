@@ -16,11 +16,16 @@ SKIP_ML_BUILD = os.environ.get("SKIP_ML_BUILD", "").lower() in ("1", "true", "ye
 DATA_JSON = ROOT / "DA_ML_期末專案" / "爬蟲" / "rated_data" / "battlecats_ALL_db.json"
 GACHA_JSON = ROOT / "BattleCats_Output" / "gacha_id_list.json"
 ML_DIR = ROOT / "battle_cats_ml_test3"
-CHARACTERS_JSON = Path(__file__).resolve().parent / "data" / "characters.json"
-MODULE_SCORES_CSV = Path(__file__).resolve().parent / "data" / "module_scores_export.csv"
+DATA_DIR = Path(__file__).resolve().parent / "data"
+CHARACTERS_JSON = DATA_DIR / "characters.json"
+MODULE_SCORES_CSV = DATA_DIR / "module_scores_export.csv"
+TIER_LIST_CSV = DATA_DIR / "battlecats_final_tier_list.csv"
+GACHA_POOLS_JSON = DATA_DIR / "gacha_pool_characters_mapping.json"
+REVIEW_SECTIONS_CSV = DATA_DIR / "id_review_sections_export.csv"
 
 APP_TITLE = "Battle Cats Analyzer"
 POOL_NAME = "超極貓祭"
+DEFAULT_POOL_KEY = "超極ネコ祭ガチャ"
 PHONE_MAX_WIDTH = 390
 
 def unit_image_url(cat_id: str, *, local: bool = True) -> str:
