@@ -377,6 +377,8 @@ flowchart LR
 
 ## 7. 數字從哪來？
 
+### 7.1 網站讀什麼、誰算
+
 | 畫面 | 資料 | 程式 |
 |------|------|------|
 | 綜合評分 / 星等 | `battlecats_final_tier_list.csv` | `tier_list.py` |
@@ -389,9 +391,63 @@ flowchart LR
 - SSR 每隻權重 = `5% ÷ 池內 SSR 數`
 - SSSR 每隻權重 = `0.3% ÷ 池內 SSSR 數`
 - `ev_current` = 未擁有角色的 `權重 × 綜合評分` 加總
-- PR40 = **0.1185**，PR80 = **0.1366**
+- PR40 = **0.1185**，PR80 = **0.1366**（全池零持有 baseline 的 40% / 80% 分位）
 
-卡池分析頁「引擎原始數據」可對照 notebook 印出的 JSON。
+卡池分析頁「引擎原始數據」可對照 notebook 印出的 JSON。  
+網站各頁可展開 **「評分 / 數據是怎麼訓練來的？」** 看完整 pipeline 摘要。
+
+### 7.2 評分怎麼訓練來的（離線 ML）
+
+> **重點**：以下都在組員 notebook / 本機跑完，結果匯入 `battlecats_analyzer/data/`；Render **不訓練**。
+
+#### Step 1 — 爬蟲與人工標籤
+
+| 項目 | 說明 |
+|------|------|
+| Notebook | `DA_ML_期末專案/爬蟲/DA_ML_期末專案_爬蟲.ipynb` |
+| 產物 | `battlecats_ALL_db.json` — 角色名、各階段面板、能力 ID |
+| 標籤 | `rated_data/score.csv` — 組員對部分角色打 **0–4.5** 分，供監督學習 |
+
+#### Step 2 — 三模組分（陣容評分）
+
+| 項目 | 說明 |
+|------|------|
+| 目錄 | `battle_cats_ml_test3/` |
+| 特徵 | `features.py` — 從 JSON 算 DPS、射程、特攻、控場等數值特徵 |
+| 打分 | `scoring.py` — 三軌獨立加權後 min-max → **0–10** |
+| 模組1 | 面板白質：DPS、成本效率、射程、速度等（`MODULE1_PANEL_WEIGHTS`） |
+| 模組2 | 屬性特化：對紅/黑/浮/天使等敵人的特攻能力 |
+| 模組3 | 屬性控場：緩速、停止、波動等控場能力 |
+| 驗證 | `ml_train.py` — RandomForest（200 棵）對有標籤角色算 Spearman / MAE |
+| 匯出 | `module_scores_export.csv` → 網站陣容評分 |
+
+#### Step 3 — 綜合評分（卡池 EV、星等）
+
+| 項目 | 說明 |
+|------|------|
+| Notebook | `卡池預測/DA_ML_rare_model.ipynb` |
+| 模型 | **XGBoost** — 輸入模組分 + 清洗後 SSR/SSSR 特徵 |
+| 輸出 | 0–5 綜合分；有真實標籤保留「真實評分」，其餘填「預測評分」 |
+| 匯出 | `battlecats_final_tier_list.csv` → `tier_list.py`、EV 引擎 |
+
+#### Step 4 — 卡池 EV（規則，非 ML）
+
+| 項目 | 說明 |
+|------|------|
+| Notebook | `DA_ML_PoolScore.ipynb` → 已移植 `gacha_explanation_engine.py` |
+| 輸入 | tier list 綜合分 + `gacha_pool_characters_mapping.json` 池內成員 |
+| 邏輯 | 抽卡機率假設 + 未擁有角色加權求和；PR40/PR80 門檻來自全池 baseline |
+
+#### Step 5 — 評語（文字，不進 EV）
+
+`id_review_sections_export.csv` — 泛用性 / 戰術 / 培養，組員整理後匯入。
+
+#### 更新流程（ML 組 → 網站）
+
+```
+notebook 重跑 → 匯出 CSV/JSON → 覆蓋 battlecats_analyzer/data/
+→ 本機 uvicorn 測試 → git commit → push → Render 自動部署
+```
 
 ---
 
@@ -441,6 +497,7 @@ A：batch 排行缺資料預設 2.37 分，單池引擎預設 2.5 分（與 note
 
 | 日期 | 摘要 |
 |------|------|
+| 2026-06-01 | 新增「評分 / 數據怎麼訓練來的」說明（網站可展開 + README §7.2） |
 | 2026-06-01 | 修復：勾選大量持有後按「更新陣容評分」500（skip_reason_type 順序 bug） |
 | 2026-06-01 | 推送：PoolScore 引擎、引擎原始數據頁、完整 README 至 GitHub |
 | 2026-06-01 | README 移至 `Ajuju/README.md` |

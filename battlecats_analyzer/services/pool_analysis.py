@@ -135,7 +135,10 @@ def analyze_pool(pool_key: str, owned_ids: list[str] | None = None, *, character
         "rankings_preview": rankings["rows"][:15],
         "rankings_thresholds": rankings["thresholds"],
         "data_sources": [
-            "角色強度：data/battlecats_final_tier_list.csv 的「綜合評分」（0–5，來自模組分 XGBoost 預測 + 人工標註合併）",
+            "角色強度：data/battlecats_final_tier_list.csv 的「綜合評分」（0–5）",
+            "  └ 訓練：DA_ML_rare_model.ipynb — XGBoost 以模組分 + SSR/SSSR 特徵預測；有人工標籤者保留真實分，其餘用預測分",
+            "陣容模組分：data/module_scores_export.csv（0–10）",
+            "  └ 訓練：battle_cats_ml_test3 — 爬蟲 JSON 抽特徵 → scoring.py 三模組加權 → min-max 縮放",
             "卡池成員：data/gacha_pool_characters_mapping.json 的 SSR / SSSR 清單",
             f"抽卡機率假設：SSR 單抽 {thresholds['p_ssr_pct']} 均分池內 {stats['total_ssr']} 隻（每隻 {thresholds['p_ssr']:.6f}）；"
             f"SSSR 單抽 {thresholds['p_sssr_pct']} 均分 {stats['total_sssr']} 隻（每隻 {thresholds['p_sssr']:.6f}）",

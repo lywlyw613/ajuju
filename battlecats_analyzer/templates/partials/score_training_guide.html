@@ -1,0 +1,65 @@
+{# 評分 / 數據訓練流程說明 — 陣容、卡池、詳情頁共用 #}
+<details class="guide-hint data-source-hint training-guide">
+  <summary>評分 / 數據是怎麼訓練來的？</summary>
+  <div class="guide-body training-guide-body">
+    <p class="training-lead">
+      組員在 <strong>本機 / Colab notebook 離線算好</strong>，匯出 CSV / JSON 後由網站讀檔顯示。
+      Render 上設 <code>SKIP_ML_BUILD=true</code>，<strong>不會在線上重新訓練</strong>任何模型。
+    </p>
+
+    <div class="training-step">
+      <h4>① 原始資料（爬蟲）</h4>
+      <ul>
+        <li>來源：<code>DA_ML_期末專案/爬蟲/DA_ML_期末專案_爬蟲.ipynb</code> 從 battlecats-db 抓取角色 JSON</li>
+        <li>產物：<code>battlecats_ALL_db.json</code>（各階段面板、射程、速度、能力 ID 等）</li>
+        <li>人工標籤：<code>rated_data/score.csv</code> — 組員對部分角色打 0–4.5 分，供 ML 監督學習</li>
+      </ul>
+    </div>
+
+    <div class="training-step">
+      <h4>② 陣容三模組分（0–10）— 陣容評分用</h4>
+      <ul>
+        <li>Pipeline：<code>battle_cats_ml_test3/features.py</code> 抽特徵 → <code>scoring.py</code> 算三軌 raw 分 → min-max 縮放到 0–10</li>
+        <li><strong>模組1 面板白質</strong>：DPS、成本效率、射程、速度等加權（見 <code>MODULE1_PANEL_WEIGHTS</code>）</li>
+        <li><strong>模組2 屬性特化</strong>：對紅/黑/浮/天使等敵人特攻能力加總</li>
+        <li><strong>模組3 屬性控場</strong>：緩速、停止、波動等控場能力加總</li>
+        <li>匯出：<code>data/module_scores_export.csv</code> → 網站 <code>roster_analysis.py</code> 對勾選角色取三模組<strong>平均</strong></li>
+        <li>另：<code>ml_train.py</code> 用 RandomForest（200 棵樹）對有人工標籤的角色做 Spearman 評估；主要用於驗證特徵，模組分本身以規則 + 特徵工程為主</li>
+      </ul>
+    </div>
+
+    <div class="training-step">
+      <h4>③ 綜合評分（0–5）— 卡池 EV、角色星等用</h4>
+      <ul>
+        <li>Notebook：<code>卡池預測/DA_ML_rare_model.ipynb</code></li>
+        <li>模型：<strong>XGBoost</strong>，輸入模組1/2/3 分與清洗後 SSR/SSSR 特徵，預測 0–5 綜合分</li>
+        <li>有人工標籤的角色保留「真實評分」；其餘填「預測評分」→ 合併成 <code>綜合評分</code> 欄</li>
+        <li>匯出：<code>data/battlecats_final_tier_list.csv</code> → <code>tier_list.py</code>、卡池 EV 引擎</li>
+      </ul>
+    </div>
+
+    <div class="training-step">
+      <h4>④ 卡池期望值 EV — 規則公式（非 ML 訓練）</h4>
+      <ul>
+        <li>邏輯移植自 <code>DA_ML_PoolScore.ipynb</code> → <code>gacha_explanation_engine.py</code></li>
+        <li>假設：SSR 單抽 5% 均分池內 SSR 數；SSSR 0.3% 均分 SSSR 數</li>
+        <li><code>ev_initial</code> = Σ(機率 × 綜合評分)；<code>ev_current</code> = 只加總<strong>尚未擁有</strong>角色的貢獻</li>
+        <li>推薦門檻 PR40=0.1185、PR80=0.1366：對<strong>全部卡池、零持有</strong> baseline 跑一遍 EV 後取 40% / 80% 分位數</li>
+        <li>卡池成員清單：<code>gacha_pool_characters_mapping.json</code>（非爬蟲即時抓取）</li>
+      </ul>
+    </div>
+
+    <div class="training-step">
+      <h4>⑤ 角色短評（文字）</h4>
+      <ul>
+        <li><code>id_review_sections_export.csv</code> — 泛用性 / 戰術 / 培養建議，由組員整理或規則產生</li>
+        <li>不參與 EV 數字計算，僅供卡池分析頁「角色短評」區塊</li>
+      </ul>
+    </div>
+
+    <p class="training-footnote">
+      重新訓練後：覆蓋 <code>battlecats_analyzer/data/</code> 對應 CSV → 本機測試 → push GitHub → Render 自動部署。
+      詳見 README「§4 資料怎麼從 ML 流到網站」。
+    </p>
+  </div>
+</details>

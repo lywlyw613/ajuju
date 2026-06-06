@@ -1343,6 +1343,48 @@ main {
   word-break: break-all;
 }
 
+.training-guide {
+  margin-top: 0.65rem;
+}
+
+.training-guide-body {
+  font-size: 0.74rem;
+  line-height: 1.55;
+}
+
+.training-lead {
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.65rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+}
+
+.training-step {
+  margin-bottom: 0.75rem;
+}
+
+.training-step h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.78);
+}
+
+.training-step ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.training-step li {
+  margin-bottom: 0.25rem;
+}
+
+.training-footnote {
+  margin: 0.5rem 0 0;
+  font-size: 0.7rem;
+  color: rgba(0, 0, 0, 0.55);
+}
+
 .insight-tile-tag-lg {
   font-size: 0.95rem;
   font-weight: 800;

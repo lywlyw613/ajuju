@@ -44,15 +44,18 @@
   {% endif %}
 
   <details class="guide-hint data-source-hint">
-    <summary>陣容分數從哪來？</summary>
+    <summary>陣容分數怎麼算？</summary>
     <div class="guide-body">
       <ul>
-        <li>資料：<code>data/module_scores_export.csv</code>（模組1/2/3 分數，0–10）</li>
-        <li>計算：勾選角色的三模組<strong>平均</strong>，再換算綜合等第</li>
-        <li>程式：<code>services/roster_analysis.py</code>（Random Forest 特徵工程產出模組分）</li>
+        <li>資料：<code>data/module_scores_export.csv</code>（模組1 面板白質 / 模組2 屬性特化 / 模組3 屬性控場，各 0–10）</li>
+        <li>訓練：爬蟲 JSON → <code>features.py</code> 抽特徵 → <code>scoring.py</code> 三軌加權 + min-max 縮放（見下方「怎麼訓練來的」）</li>
+        <li>網站計算：勾選角色的三模組<strong>平均</strong> → 換算等第（S/A/B/C）與陣容 tier</li>
+        <li>程式：<code>services/roster_analysis.py</code></li>
       </ul>
     </div>
   </details>
+
+  {% include "partials/score_training_guide.html" %}
 </section>
 {% elif owned_count == 0 %}
 <section class="card">

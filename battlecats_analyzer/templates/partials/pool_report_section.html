@@ -122,17 +122,19 @@
   {% endif %}
 
   <details class="guide-hint data-source-hint">
-    <summary>這些數字從哪來？</summary>
+    <summary>這些數字怎麼算？（EV / 推薦 / pockets）</summary>
     <div class="guide-body">
       <ul>
         {% for line in pool_report.data_sources %}
         <li>{{ line }}</li>
         {% endfor %}
-        <li>引擎程式：<code>services/gacha_explanation_engine.py</code>（對應組員 notebook <code>DA_ML_PoolScore</code>）</li>
-        <li>陣容評分的模組分來自 <code>module_scores_export.csv</code>（Random Forest 特徵工程 pipeline）</li>
+        <li>引擎程式：<code>services/gacha_explanation_engine.py</code>（對應 notebook <code>DA_ML_PoolScore</code>）</li>
+        <li>綜合評分來自 XGBoost 預測 + 人工標註合併的 tier list（見下方「怎麼訓練來的」）</li>
       </ul>
     </div>
   </details>
+
+  {% include "partials/score_training_guide.html" %}
 
 </section>
 
