@@ -3,6 +3,13 @@
 <div class="breadcrumb"><a href="/">首頁</a> &gt;&gt; 搜尋角色</div>
 {% endblock %}
 {% block content %}
+<details class="guide-hint">
+  <summary>不會用？點這裡看快速提示</summary>
+  <div class="guide-body">
+    輸入角色名或 ID → 按「搜尋」→ 點「查看數值」。完整教學請回<a href="/">首頁</a>。
+  </div>
+</details>
+
 <form class="search-form" method="get" action="/search">
   <input type="search" name="q" value="{{ query }}" placeholder="搜尋角色名稱" />
   <button type="submit" class="btn btn-primary" style="padding:0.7rem 1rem;border-radius:10px;">搜尋</button>

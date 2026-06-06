@@ -896,6 +896,74 @@ main {
   white-space: pre-wrap;
 }
 
+/* --- 新手使用指南 --- */
+.guide-card .guide-intro {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: -0.25rem 0 0.65rem;
+  line-height: 1.5;
+}
+
+.guide-step,
+.guide-hint {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 0.45rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.guide-hint {
+  margin-bottom: 0.85rem;
+  font-size: 0.8rem;
+}
+
+.guide-step summary,
+.guide-hint summary {
+  cursor: pointer;
+  padding: 0.6rem 0.7rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+  list-style: none;
+  color: var(--text);
+}
+
+.guide-step summary::-webkit-details-marker,
+.guide-hint summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-body {
+  padding: 0 0.75rem 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.guide-body ul {
+  margin: 0 0 0 1rem;
+  padding: 0;
+}
+
+.guide-body li {
+  margin-bottom: 0.35rem;
+}
+
+.guide-body a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.guide-tip {
+  margin-top: 0.65rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.45;
+  padding: 0.5rem 0.6rem;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+}
+
 /* --- 外層舞台（手機／桌面共用） --- */
 .app-stage {
   width: 100%;
