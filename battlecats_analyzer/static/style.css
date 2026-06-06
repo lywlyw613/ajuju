@@ -877,3 +877,95 @@ main {
   white-space: pre-wrap;
 }
 
+/* --- 外層舞台（手機／桌面共用） --- */
+.app-stage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.phone-device {
+  width: 100%;
+  max-width: 390px;
+}
+
+.phone-shell {
+  width: 100%;
+}
+
+/* --- 桌面：固定手機比例 + 裝置外框，內容與手機版一致 --- */
+@media (min-width: 520px) {
+  body {
+    align-items: center;
+    padding: 2rem 1.25rem;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(180, 76, 57, 0.12), transparent 70%),
+      radial-gradient(ellipse 60% 50% at 80% 100%, rgba(91, 61, 143, 0.1), transparent 65%),
+      linear-gradient(165deg, #1e1e26 0%, #2c2c34 45%, #23232c 100%);
+  }
+
+  .app-stage {
+    max-width: 420px;
+  }
+
+  .phone-device {
+    position: relative;
+    max-width: 390px;
+    border-radius: 32px;
+    padding: 10px;
+    background: linear-gradient(145deg, #3a3a48 0%, #222228 100%);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 32px 64px rgba(0, 0, 0, 0.55),
+      0 12px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .phone-device::before {
+    content: "";
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 96px;
+    height: 24px;
+    background: #0c0c10;
+    border-radius: 999px;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .phone-shell {
+    max-width: 390px;
+    min-height: 0;
+    height: min(844px, calc(100vh - 4rem));
+    max-height: min(844px, calc(100vh - 4rem));
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .site-header {
+    padding-top: 2rem;
+    flex-shrink: 0;
+  }
+
+  .breadcrumb {
+    flex-shrink: 0;
+  }
+
+  main {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .gacha-bottom-bar {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(transparent, var(--bg-phone) 30%);
+  }
+}
