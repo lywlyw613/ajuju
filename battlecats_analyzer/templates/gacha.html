@@ -70,7 +70,16 @@
 
     <div class="pool-report-label">Explanation</div>
 
-    <div class="explanation-text">{{ pool_report.explanation }}</div>
+    <ul class="explanation-list">
+      {% for item in pool_report.explanation_items %}
+      <li>
+        <span class="explanation-head">{{ item.head }}</span>
+        {% if item.points %}
+        <span class="explanation-points">{{ item.points|join(' · ') }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
 
   </div>
 

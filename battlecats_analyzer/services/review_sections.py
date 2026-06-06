@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import re
 from pathlib import Path
 
 from config import REVIEW_SECTIONS_CSV
@@ -42,16 +43,80 @@ def get_review(cat_id: str) -> dict | None:
     return load_reviews().get(str(cat_id).zfill(3))
 
 
-def build_explanation_snippet(review: dict | None, char_name: str = "") -> list[str]:
-    """Turn review sections into bullet-style explanation lines."""
+def _clean_text(text: str) -> str:
+    text = re.sub(r"[【】<>]", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def _first_clause(text: str, max_len: int = 20) -> str:
+    if not text:
+        return ""
+    text = _clean_text(text)
+    for sep in "。；":
+        if sep in text:
+            text = text.split(sep)[0]
+            break
+    if len(text) > max_len:
+        return text[: max_len - 1] + "…"
+    return text
+
+
+def _versatility_tag(text: str) -> str:
+    if not text:
+        return ""
+    if "極高" in text or "優秀" in text:
+        return "泛用性高"
+    if "中規中矩" in text:
+        return "泛用性中等"
+    if "偏低" in text or "不足" in text:
+        return "泛用性偏低"
+    return _first_clause(text, 14)
+
+
+def _tactics_tag(text: str) -> str:
+    if not text:
+        return ""
+    m = re.search(r"【([^】]+)】", text)
+    if m:
+        role = m.group(1).replace("。", "").strip()
+        return role[:16]
+    if "控場" in text:
+        return "控場型"
+    if "特化" in text:
+        return "屬性特化"
+    if "倉庫" in text:
+        return "倉庫位"
+    return _first_clause(text, 14)
+
+
+def _training_tag(text: str) -> str:
+    if not text:
+        return ""
+    if "強烈" in text or "極高" in text:
+        return "優先培養"
+    if "不推薦" in text or "極低" in text:
+        return "不建議抽"
+    if "中等" in text or "適當" in text:
+        return "視需求培養"
+    if "偏高" in text:
+        return "值得培養"
+    return _first_clause(text, 14)
+
+
+def summarize_review_bullets(review: dict | None, max_points: int = 3) -> list[str]:
+    """Condense review CSV fields into short bullet phrases."""
     if not review:
         return []
-    lines: list[str] = []
-    label = char_name or review.get("name") or "此角色"
-    if review.get("versatility"):
-        lines.append(f"{label}：{review['versatility']}")
-    if review.get("tactics"):
-        lines.append(review["tactics"])
-    if review.get("training"):
-        lines.append(review["training"])
-    return lines
+    raw = [
+        _versatility_tag(review.get("versatility", "")),
+        _tactics_tag(review.get("tactics", "")),
+        _training_tag(review.get("training", "")),
+    ]
+    points: list[str] = []
+    for tag in raw:
+        if tag and tag not in points:
+            points.append(tag)
+        if len(points) >= max_points:
+            break
+    return points
