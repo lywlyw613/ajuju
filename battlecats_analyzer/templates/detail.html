@@ -29,9 +29,21 @@
 </div>
 
 <div class="module-bars">
-  <div class="module-bar">模組1<div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod1 * 10)|int }}%"></div></div>{{ c.module_scores.mod1 }}</div>
-  <div class="module-bar">模組2<div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod2 * 10)|int }}%"></div></div>{{ c.module_scores.mod2 }}</div>
-  <div class="module-bar">模組3<div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod3 * 10)|int }}%"></div></div>{{ c.module_scores.mod3 }}</div>
+  <div class="module-bar">
+    <span class="module-bar-label">面板白質評分</span>
+    <div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod1 * 10)|int }}%"></div></div>
+    <span class="module-bar-score">{{ c.module_scores.mod1 }}</span>
+  </div>
+  <div class="module-bar">
+    <span class="module-bar-label">屬性特化評分</span>
+    <div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod2 * 10)|int }}%"></div></div>
+    <span class="module-bar-score">{{ c.module_scores.mod2 }}</span>
+  </div>
+  <div class="module-bar">
+    <span class="module-bar-label">屬性控場評分</span>
+    <div class="bar"><div class="fill" style="width:{{ (c.module_scores.mod3 * 10)|int }}%"></div></div>
+    <span class="module-bar-score">{{ c.module_scores.mod3 }}</span>
+  </div>
 </div>
 
 <section class="card">
