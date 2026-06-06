@@ -7,6 +7,16 @@
 {% endblock %}
 
 {% block content %}
+{% macro explanation_row(item) %}
+<li>
+  <div class="explanation-head">
+    <strong class="char-name-bold">{{ item.name }}</strong>{% if item.grade %}<span class="explanation-grade">（{{ item.grade }}）</span>{% endif %}
+  </div>
+  {% if item.points %}
+  <div class="explanation-points">{{ item.points|join(' · ') }}</div>
+  {% endif %}
+</li>
+{% endmacro %}
 
 <h2 class="hero-title">{{ pool_name }}</h2>
 
@@ -79,12 +89,7 @@
 
     <ul class="explanation-list">
       {% for item in pool_report.explanation_visible %}
-      <li>
-        <span class="explanation-head char-name">{{ item.head }}</span>
-        {% if item.points %}
-        <span class="explanation-points">{{ item.points|join(' · ') }}</span>
-        {% endif %}
-      </li>
+      {{ explanation_row(item) }}
       {% endfor %}
     </ul>
 
@@ -93,12 +98,7 @@
       <summary>展開列表（另有 {{ pool_report.explanation_hidden_count }} 項）</summary>
       <ul class="explanation-list">
         {% for item in pool_report.explanation_hidden %}
-        <li>
-          <span class="explanation-head char-name">{{ item.head }}</span>
-          {% if item.points %}
-          <span class="explanation-points">{{ item.points|join(' · ') }}</span>
-          {% endif %}
-        </li>
+        {{ explanation_row(item) }}
         {% endfor %}
       </ul>
     </details>

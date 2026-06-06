@@ -728,7 +728,7 @@ main {
 .explanation-list li {
   font-size: 0.76rem;
   line-height: 1.5;
-  padding: 0.6rem 0.75rem;
+  padding: 0.65rem 0.85rem;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 8px;
   word-break: break-word;
@@ -737,11 +737,20 @@ main {
 
 .explanation-head {
   display: block;
-  font-weight: 800;
   color: var(--text);
   margin-bottom: 0.2rem;
   line-height: 1.35;
-  padding-right: 0.15rem;
+}
+
+.char-name-bold {
+  font-weight: 900;
+  font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.explanation-grade {
+  font-weight: 600;
+  margin-left: 0.1rem;
 }
 
 .explanation-points {
@@ -749,7 +758,7 @@ main {
   color: var(--muted);
   font-size: 0.72rem;
   line-height: 1.45;
-  padding-right: 0.1rem;
+  padding-left: 0.05rem;
 }
 
 .pool-report-grid {

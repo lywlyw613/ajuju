@@ -54,7 +54,13 @@ def _character_explanation_item(c: dict) -> dict | None:
             fallback.append("尚無評語資料")
         points = fallback
 
-    return {"head": head, "points": points, "id": c["id"]}
+    return {
+        "head": head,
+        "name": name,
+        "grade": grade if grade and grade != "—" else "",
+        "points": points,
+        "id": c["id"],
+    }
 
 
 def _build_explanation_items(characters: list[dict]) -> tuple[dict, list[dict]]:
