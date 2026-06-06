@@ -431,7 +431,7 @@ main {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.65rem;
-  margin-bottom: 4.5rem;
+  margin-bottom: 1rem;
   min-width: 0;
 }
 
@@ -556,18 +556,54 @@ main {
   border-radius: 10px;
 }
 
-.gacha-bottom-bar {
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.75rem 0;
-  background: linear-gradient(transparent, var(--bg-phone) 25%);
-  margin-top: -3rem;
+.gacha-fab-stack {
+  position: fixed;
+  right: max(0.65rem, calc((100vw - min(390px, 100vw)) / 2 + 0.65rem));
+  bottom: 1.15rem;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.gacha-bottom-bar .btn {
-  width: 100%;
+.gacha-fab {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.gacha-fab:active {
+  transform: scale(0.94);
+}
+
+.gacha-fab-glyph {
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.gacha-fab-save {
+  background: #fff;
+  color: var(--text);
+}
+
+.gacha-fab-analyze {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.gacha-fab-analyze:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .roster-result .tier-badge {
@@ -1640,11 +1676,6 @@ main {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-  }
-
-  .gacha-bottom-bar {
-    position: sticky;
-    bottom: 0;
-    background: linear-gradient(transparent, var(--bg-phone) 30%);
+    padding-bottom: 4.5rem;
   }
 }

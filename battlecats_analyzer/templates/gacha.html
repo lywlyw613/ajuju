@@ -116,7 +116,7 @@
 
 {% endif %}
 
-<p class="hero-sub" style="margin-top:0.35rem;font-size:0.75rem">勾選後按「儲存持有」或「更新陣容評分」（皆會寫入 Session，換頁不會消失）</p>
+<p class="hero-sub" style="margin-top:0.35rem;font-size:0.75rem">勾選後按右側「存」或「評」圓鈕（皆會寫入 Session，換頁不會消失）</p>
 
 
 
@@ -145,10 +145,6 @@
     <a class="btn btn-ghost" href="/gacha?pool={{ pool_key|urlencode }}&q={{ query|urlencode }}&select_all=1">全選目前列表</a>
 
     <a class="btn btn-ghost" href="/gacha?pool={{ pool_key|urlencode }}&q={{ query|urlencode }}&clear_owned=1">清除勾選</a>
-
-    <button type="submit" name="action" value="save" class="btn btn-ghost">儲存持有</button>
-
-    <button type="submit" name="action" value="analyze" class="btn btn-primary">更新陣容評分</button>
 
   </div>
 
@@ -222,12 +218,13 @@
 
 
 
-  <div class="gacha-bottom-bar">
-
-    <button type="submit" name="action" value="save" class="btn btn-ghost" style="margin-bottom:0.5rem">儲存持有</button>
-
-    <button type="submit" name="action" value="analyze" class="btn btn-primary">更新陣容評分</button>
-
+  <div class="gacha-fab-stack" role="group" aria-label="持有操作">
+    <button type="submit" name="action" value="save" class="gacha-fab gacha-fab-save" title="儲存持有" aria-label="儲存持有">
+      <span class="gacha-fab-glyph" aria-hidden="true">存</span>
+    </button>
+    <button type="submit" name="action" value="analyze" class="gacha-fab gacha-fab-analyze" title="更新陣容評分" aria-label="更新陣容評分">
+      <span class="gacha-fab-glyph" aria-hidden="true">評</span>
+    </button>
   </div>
 
 </form>
